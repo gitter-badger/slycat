@@ -33,6 +33,7 @@ parser.add_argument("--cluster-metric", default="euclidean", choices=["euclidean
 parser.add_argument("--marking", default="", help="Marking type.  Default: %(default)s")
 parser.add_argument("--model-description", default=None, help="New model description.  Defaults to a summary of the input parameters.")
 parser.add_argument("--model-name", default=None, help="New model name.  Defaults to the name of the input data directory.")
+parser.add_argument("--preview-max-error", default=0.01, help="Maximum preview timeseries error.  Default: %(default)s")
 parser.add_argument("--project-description", default="", help="New project description.  Default: %(default)s")
 parser.add_argument("--project-name", default="HDF5-Timeseries", help="New or existing project name.  Default: %(default)s")
 arguments = parser.parse_args()
@@ -51,6 +52,8 @@ if arguments.model_description is None:
     arguments.model_description += "Cluster sample count: %s.\n" % arguments.cluster_sample_count
   arguments.model_description += "Cluster method: %s.\n" % arguments.cluster_type
   arguments.model_description += "Cluster distance metric: %s.\n" % arguments.cluster_metric
+  arguments.model_description += "Preview method: sliding-window.\n"
+  arguments.model_description += "Preview max error: %s.\n" % arguments.preview_max_error
 
 pool = IPython.parallel.Client()
 
@@ -76,6 +79,7 @@ try:
   connection.store_parameter(mid, "cluster-bin-type", arguments.cluster_sample_type)
   connection.store_parameter(mid, "cluster-type", arguments.cluster_type)
   connection.store_parameter(mid, "cluster-metric", arguments.cluster_metric)
+  connection.store_parameter(mid, "preview-max-error", arguments.preview_max_error)
 
   connection.update_model(mid, message="Storing input table.")
 
@@ -141,10 +145,11 @@ try:
     time_max = max(zip(*ranges)[1])
 
     if arguments.cluster_sample_type == "uniform-pla":
-      def uniform_pla(directory, min_time, max_time, bin_count, timeseries_index, attribute_index):
+      def uniform_pla(directory, min_time, max_time, bin_count, preview_max_error, timeseries_index, attribute_index):
         import numpy
         import os
         import slycat.hdf5
+        import slycat.timeseries.segmentation
 
         bin_edges = numpy.linspace(min_time, max_time, bin_count + 1)
         bin_times = (bin_edges[:-1] + bin_edges[1:]) / 2
@@ -152,23 +157,28 @@ try:
           original_times = slycat.hdf5.get_array_attribute(file, 0, 0)[:]
           original_values = slycat.hdf5.get_array_attribute(file, 0, attribute_index + 1)[:]
         bin_values = numpy.interp(bin_times, original_times, original_values)
+        preview_times, preview_values = slycat.timeseries.segmentation.sliding_window(original_times, original_values, preview_max_error)
         return {
           "input-index" : timeseries_index,
-          "times" : bin_times,
-          "values" : bin_values,
+          "analysis-times" : bin_times,
+          "analysis-values" : bin_values,
+          "preview-times" : preview_times,
+          "preview-values" : preview_values,
         }
       directories = itertools.repeat(arguments.directory, len(storage))
       min_times = itertools.repeat(time_min, len(storage))
       max_times = itertools.repeat(time_max, len(storage))
       bin_counts = itertools.repeat(arguments.cluster_sample_count, len(storage))
+      preview_max_error = itertools.repeat(arguments.preview_max_error, len(storage))
       timeseries_indices = [timeseries for timeseries, attribute in storage]
       attribute_indices = [attribute for timeseries, attribute in storage]
-      waveforms = pool[:].map_sync(uniform_pla, directories, min_times, max_times, bin_counts, timeseries_indices, attribute_indices)
+      waveforms = pool[:].map_sync(uniform_pla, directories, min_times, max_times, bin_counts, preview_max_error, timeseries_indices, attribute_indices)
     elif arguments.cluster_sample_type == "uniform-paa":
-      def uniform_paa(directory, min_time, max_time, bin_count, timeseries_index, attribute_index):
+      def uniform_paa(directory, min_time, max_time, bin_count, preview_max_error, timeseries_index, attribute_index):
         import numpy
         import os
         import slycat.hdf5
+        import slycat.timeseries.segmentation
 
         bin_edges = numpy.linspace(min_time, max_time, bin_count + 1)
         bin_times = (bin_edges[:-1] + bin_edges[1:]) / 2
@@ -183,18 +193,25 @@ try:
         bin_counts[lonely_bins] = 1
         bin_sums[lonely_bins] = numpy.interp(bin_times, original_times, original_values)[lonely_bins]
         bin_values = bin_sums / bin_counts
+        preview_times, preview_values = slycat.timeseries.segmentation.sliding_window(original_times, original_values, preview_max_error)
         return {
           "input-index" : timeseries_index,
-          "times" : bin_times,
-          "values" : bin_values,
+          "analysis-times" : bin_times,
+          "analysis-values" : bin_values,
+          "preview-times" : preview_times,
+          "preview-values" : preview_values,
         }
       directories = itertools.repeat(arguments.directory, len(storage))
       min_times = itertools.repeat(time_min, len(storage))
       max_times = itertools.repeat(time_max, len(storage))
       bin_counts = itertools.repeat(arguments.cluster_sample_count, len(storage))
+      preview_max_error = itertools.repeat(arguments.preview_max_error, len(storage))
       timeseries_indices = [timeseries for timeseries, attribute in storage]
       attribute_indices = [attribute for timeseries, attribute in storage]
-      waveforms = pool[:].map_sync(uniform_paa, directories, min_times, max_times, bin_counts, timeseries_indices, attribute_indices)
+      waveforms = pool[:].map_sync(uniform_paa, directories, min_times, max_times, bin_counts, preview_max_error, timeseries_indices, attribute_indices)
+
+    for waveform in waveforms:
+      slycat.web.client.log.info("Preview samples: %s" % (len(waveform["preview-times"])))
 
     # Compute a distance matrix comparing every series to every other ...
     observation_count = len(waveforms)
@@ -203,7 +220,7 @@ try:
       #connection.update_model(mid, message="Computing distance matrix for %s, %s of %s" % (name, i+1, observation_count), progress=mix(progress_begin, progress_end, float(i) / float(observation_count)))
       slycat.web.client.log.info("Computing distance matrix for %s, %s of %s" % (name, i+1, observation_count))
       for j in range(i + 1, observation_count):
-        distance = numpy.sqrt(numpy.sum(numpy.power(waveforms[j]["values"] - waveforms[i]["values"], 2.0)))
+        distance = numpy.sqrt(numpy.sum(numpy.power(waveforms[j]["analysis-values"] - waveforms[i]["analysis-values"], 2.0)))
         distance_matrix[i, j] = distance
         distance_matrix[j, i] = distance
 
@@ -273,11 +290,11 @@ try:
     for index, waveform in enumerate(waveforms):
       slycat.web.client.log.info("Creating preview %s" % index)
       attributes = [("time", "float64"), ("value", "float64")]
-      dimensions = [("sample", "int64", 0, len(waveform["times"]))]
+      dimensions = [("sample", "int64", 0, len(waveform["preview-times"]))]
       connection.start_array(mid, "preview-%s" % name, index, attributes, dimensions)
 
     slycat.web.client.log.info("Storing previews")
-    connection.store_array_set_data(mid, "preview-%s" % name, data=[waveform[key] for waveform in waveforms for key in ["times", "values"]])
+    connection.store_array_set_data(mid, "preview-%s" % name, data=[waveform[key] for waveform in waveforms for key in ["preview-times", "preview-values"]])
 
   connection.update_model(mid, state="finished", result="succeeded", finished=datetime.datetime.utcnow().isoformat(), progress=1.0, message="")
 except:
