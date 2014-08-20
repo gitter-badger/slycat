@@ -2,35 +2,11 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Slycat uses `CouchDB <http://couchdb.apache.org>`_ as its primary storage
-index, tracking projects, models, bookmarks, along with metadata and small
-model artficats.  For large model artifacts such as
-:mod:`darrays<slycat.darray>`, the CouchDB database stores links to HDF5 files
-stored on disk.
-"""
-
 from __future__ import absolute_import
 
 import cherrypy
 import couchdb.client
-import threading
 import uuid
-
-class Database(object):
-  def __init__(self, storage):
-    self._storage = storage
-
-def database(url=None, name=None):
-  with database._instance_lock:
-    if database._instance is None:
-      if url is None:
-        url = cherrypy.tree.apps[""].config["slycat"]["couchdb-host"]
-      if name is None:
-        name = cherrypy.tree.apps[""].config["slycat"]["couchdb-database"]
-      database._instance = Database(couchdb.client.Server(url=url)[name])
-  return database._instance
-database._instance = None
-database._instance_lock = threading.Lock()
 
 #################################################################################################################
 # Deprecated API, don't use in new code.

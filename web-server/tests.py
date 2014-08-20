@@ -11,6 +11,7 @@ import slycat.web.client
 import shutil
 import subprocess
 import sys
+import threading
 import time
 
 server_process = None
@@ -802,4 +803,24 @@ def test_server_administrator():
 
   # Server admins can delete any project.
   server_admin.delete_project(pid)
+
+def test_concurrent_requests():
+  pid = connection.create_project("concurrent-request-project")
+  mid = connection.create_model(pid, "generic", "concurrent-request-model")
+
+  def set_message(connection, mid, message):
+    connection.update_model(mid, message=message)
+
+  messages = ["Update %s" % i for i in range(20)]
+  threads = [threading.Thread(target=set_message, args=(connection, mid, message)) for message in messages]
+  for thread in threads:
+    thread.start()
+  for thread in threads:
+    thread.join()
+
+  model = connection.get_model(mid)
+  sys.stderr.write(str(model) + "\n")
+
+  connection.delete_model(mid)
+  connection.delete_project(pid)
 

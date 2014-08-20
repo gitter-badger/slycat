@@ -25,6 +25,7 @@ import sys
 import slycat.hdf5
 import slycat.web.server
 import slycat.web.server.authentication
+import slycat.web.server.couchdb
 import slycat.web.server.database.couchdb
 import slycat.web.server.database.hdf5
 import slycat.web.server.model.cca
@@ -339,22 +340,22 @@ def get_model(mid, **kwargs):
 
 @cherrypy.tools.json_in(on = True)
 def put_model(mid):
-  database = slycat.web.server.database.couchdb.connect()
-  model = database.get("model", mid)
-  project = database.get("project", model["project"])
-  slycat.web.server.authentication.require_project_writer(project)
+  database = slycat.web.server.couchdb.database()
+  with database.get("model", mid) as model:
+    with database.get("project", model["project"]) as project:
+      slycat.web.server.authentication.require_project_writer(project)
 
-  save_model = False
-  for key, value in cherrypy.request.json.items():
-    if key in ["name", "description", "state", "result", "progress", "message", "started", "finished"]:
-      if value != model.get(key):
-        model[key] = value
-        save_model = True
-    else:
-      raise cherrypy.HTTPError("400 Unknown model parameter: %s" % key)
+    save_model = False
+    for key, value in cherrypy.request.json.items():
+      if key not in ["name", "description", "state", "result", "progress", "message", "started", "finished"]:
+        raise cherrypy.HTTPError("400 Unknown model parameter: %s" % key)
+      if value == model.get(key):
+        continue
+      model[key] = value
+      save_model = True
 
-  if save_model:
-    database.save(model)
+    if save_model:
+      database.save(model)
 
 def post_model_finish(mid):
   database = slycat.web.server.database.couchdb.connect()
