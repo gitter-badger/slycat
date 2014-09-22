@@ -343,6 +343,7 @@ def get_model(mid, **kwargs):
       return slycat.web.server.template.render("model-parameter-image.html", context)
 
     if "model-type" in model and model["model-type"] in slycat.web.server.plugin.manager.models.keys():
+      context["slycat-marking-html"] = marking.html(model["marking"])
       context["slycat-plugin-content"] = slycat.web.server.plugin.manager.models[model["model-type"]]["html"](database, model)
 
     return slycat.web.server.template.render("model.html", context)

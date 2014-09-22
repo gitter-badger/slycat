@@ -14,4 +14,8 @@ slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$location",
       $scope.project = data;
     });
   });
+
+  $scope.edit = function()
+  {
+  }
 }]);

@@ -34,12 +34,15 @@ rights in this software.
             <li><a href="<%server-root%>projects/{{project._id}}">{{project.name}}</a></li>
             <li class="active"><p class="navbar-text">{{model.name}}</p></li>
           </ul>
-          <button type="button" class="btn btn-default navbar-btn navbar-right">Edit Model</button>
+          <button type="button" class="btn btn-default navbar-btn navbar-right" ng-click="edit()">Edit Model</button>
         </div>
       </div>
     </div>
 
     <div id="slycat-content" class="container-fluid">
+      <%{ slycat-marking-html }%>
+      <%{ slycat-plugin-content }%>
+      <%{ slycat-marking-html }%>
     </div>
 
   </body>
