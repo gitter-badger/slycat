@@ -2,18 +2,22 @@ var slycatApp = angular.module("slycat-application", ["ui.bootstrap"]);
 
 slycatApp.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
 {
+  $scope.server_root = "";
   $scope.project = {};
   $scope.model = {};
 
-  $http.get($window.location.href).success(function(data)
+  $scope.init = function(server_root)
   {
-    $scope.model = data;
-
-    $http.get("/projects/" + $scope.model.project).success(function(data)
+    $scope.server_root = server_root;
+    $http.get($window.location.href).success(function(data)
     {
-      $scope.project = data;
+      $scope.model = data;
+      $http.get($scope.server_root + "projects/" + $scope.model.project).success(function(data)
+      {
+        $scope.project = data;
+      });
     });
-  });
+  }
 
   $scope.edit = function()
   {
@@ -46,7 +50,7 @@ slycatApp.controller("slycat-model-controller", ["$scope", "$window", "$http", "
           {
             $http.delete($window.location.href).success(function()
             {
-              $window.location.href = "/projects/" + $scope.project._id;
+              $window.location.href = $scope.server_root + "projects/" + $scope.project._id;
             });
           }
         }
