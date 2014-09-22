@@ -1,6 +1,20 @@
-var slycatApp = angular.module("slycat-application", ["ui.bootstrap"]);
+var slycat_application = angular.module("slycat-application", ["ui.bootstrap"]);
 
-slycatApp.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
+slycat_application.controller("slycat-new-model-controller", function($scope)
+{
+  $scope.finished = [
+    {"name":"Model A"},
+    {"name":"Model B"},
+    {"name":"Model C"},
+  ];
+
+  $scope.working = [
+    {"name":"Model D"},
+    {"name":"Model E"},
+  ];
+});
+
+slycat_application.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
 {
   $scope.server_root = "";
   $scope.project = {};

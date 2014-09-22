@@ -33,6 +33,19 @@ rights in this software.
           <ul class="nav navbar-nav">
             <li><a href="<<slycat-server-root>>projects/{{project._id}}">{{project.name}}</a></li>
             <li class="active"><p class="navbar-text" popover-title="{{model.name}}" popover="{{model.description}}" popover-placement="bottom" popover-trigger="mouseenter" popover-animation="false">{{model.name}}</p></li>
+
+            <li class="dropdown" ng-controller="slycat-new-model-controller">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">New Models <span class="badge">{{finished.length}} / {{working.length}}</span> <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Finished model</a></li>
+                <li><a href="#">Another finished model</a></li>
+                <li><a href="#">Some other finished model</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Working model</a></li>
+                <li><a href="#">One more working model</a></li>
+              </ul>
+            </li>
+
           </ul>
           <button type="button" class="btn btn-default navbar-btn navbar-right" ng-click="edit()">Edit Model</button>
         </div>
