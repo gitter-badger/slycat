@@ -1,4 +1,4 @@
-var slycatApp = angular.module("slycat-application", []);
+var slycatApp = angular.module("slycat-application", ["ui.bootstrap"]);
 
 slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$location", function($scope, $http, $location)
 {

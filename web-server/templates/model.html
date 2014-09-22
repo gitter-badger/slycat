@@ -11,27 +11,35 @@ rights in this software.
 <html ng-app="slycat-application" ng-controller="slycat-model-controller">
   <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="https://code.angularjs.org/1.2.25/angular.min.js"></script>
+    <script type="text/javascript" src="<%server-root%>js/ui-bootstrap-tpls-0.11.0.min.js"></script>
     <script type="text/javascript" src="<%server-root%>js/slycat.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="<%server-root%>style/slycat.css" type="text/css">
     <title>{{model.name}} - Slycat Model</title>
   </head>
 
   <body>
-    <div id="slycat-workers">
+    <div id="slycat-workers" class="container-fluid">
     </div>
 
-    <div id="slycat-header">
-      <div class="slycat-width-wrapper">
-        <ul id="slycat-breadcrumbs">
-          <li><a href="<%server-root%>">Slycat</a></li>
-          <li><a href="<%server-root%>projects/{{project._id}}">{{project.name}}</a></li>
-          <li>{{model.name}}</li>
-        </ul>
+    <div id="slycat-header" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="<%server-root%>">Slycat</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="<%server-root%>projects/{{project._id}}">{{project.name}}</a></li>
+            <li class="active"><p class="navbar-text">{{model.name}}</p></li>
+          </ul>
+          <button type="button" class="btn btn-default navbar-btn navbar-right">Edit Model</button>
+        </div>
       </div>
     </div>
 
-    <div id="slycat-content">
+    <div id="slycat-content" class="container-fluid">
     </div>
 
   </body>
