@@ -1,11 +1,11 @@
 var slycatApp = angular.module("slycat-application", ["ui.bootstrap"]);
 
-slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$modal", function($scope, $http, $modal)
+slycatApp.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
 {
   $scope.project = {};
   $scope.model = {};
 
-  $http.get(window.location.href).success(function(data)
+  $http.get($window.location.href).success(function(data)
   {
     $scope.model = data;
 
@@ -22,22 +22,39 @@ slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$modal", fu
       controller: edit_model_controller,
       resolve:
       {
+        "project" : function() { return {"_id":$scope.project._id}; },
         "model" : function() { return {"name":$scope.model.name, "description":$scope.model.description}; },
       },
     });
 
-    edit_model.result.then(function(changes)
-    {
-      $scope.model.name = changes.name;
-      $scope.model.description = changes.description;
-      $http.put(window.location.href, changes).error(function(data, status, headers, config)
+    edit_model.result.then
+    (
+      function(changes)
       {
-        console.log(data, status, headers, config);
-      });
-    });
+        $scope.model.name = changes.name;
+        $scope.model.description = changes.description;
+        $http.put($window.location.href, changes).error(function(data, status, headers, config)
+        {
+          console.log(data, status, headers, config);
+        });
+      },
+      function(reason)
+      {
+        if(reason == "delete")
+        {
+          if($window.confirm("Delete " + $scope.model.name + "? All data will be deleted immediately, and this cannot be undone."))
+          {
+            $http.delete($window.location.href).success(function()
+            {
+              $window.location.href = "/projects/" + $scope.project._id;
+            });
+          }
+        }
+      }
+    );
   }
 
-  var edit_model_controller = function ($scope, $modalInstance, model)
+  var edit_model_controller = function ($scope, $window, $http, $modalInstance, model)
   {
     $scope.model = model;
 
@@ -53,7 +70,7 @@ slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$modal", fu
 
     $scope.delete = function()
     {
-      $modalInstance.close();
+      $modalInstance.dismiss("delete");
     }
   };
 
