@@ -30,6 +30,10 @@ slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$modal", fu
     {
       $scope.model.name = changes.name;
       $scope.model.description = changes.description;
+      $http.put(window.location.href, changes).error(function(data, status, headers, config)
+      {
+        console.log(data, status, headers, config);
+      });
     });
   }
 
