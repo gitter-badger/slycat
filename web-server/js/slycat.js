@@ -20,22 +20,26 @@ slycatApp.controller("slycat-model-controller", ["$scope", "$http", "$modal", fu
     var edit_model = $modal.open({
       templateUrl: "slycat-edit-model.html",
       controller: edit_model_controller,
-      scope: $scope,
+      resolve:
+      {
+        "model" : function() { return {"name":$scope.model.name, "description":$scope.model.description}; },
+      },
     });
 
     edit_model.result.then(function(changes)
     {
-      console.log(changes);
       $scope.model.name = changes.name;
       $scope.model.description = changes.description;
     });
   }
 
-  var edit_model_controller = function ($scope, $modalInstance)
+  var edit_model_controller = function ($scope, $modalInstance, model)
   {
+    $scope.model = model;
+
     $scope.ok = function()
     {
-      $modalInstance.close({"name":$scope.model.name, "description":$scope.model.description});
+      $modalInstance.close($scope.model);
     }
 
     $scope.cancel = function()
