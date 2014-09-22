@@ -9,6 +9,11 @@ body
   padding-top: 70px;
 }
 
+.popover
+{
+  min-width: 300px;
+}
+
 /*
 .breadcrumb > li + li:before
 {
