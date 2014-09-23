@@ -1,17 +1,46 @@
 var slycat_application = angular.module("slycat-application", ["ui.bootstrap"]);
 
-slycat_application.controller("slycat-new-model-controller", function($scope)
+slycat_application.controller("slycat-new-model-controller", function($scope, $http, $window)
 {
-  $scope.finished = [
-    {"name":"Model A"},
-    {"name":"Model B"},
-    {"name":"Model C"},
-  ];
+  $scope.current_revision = null;
+  $scope.finished = [];
+  $scope.running = [];
 
-  $scope.working = [
-    {"name":"Model D"},
-    {"name":"Model E"},
-  ];
+  function update()
+  {
+    var url = $scope.server_root + "models" + "?_=" + new Date().getTime();
+    if($scope.current_revision != null)
+      url += "&revision=" + $scope.current_revision;
+
+    $http.get(url).success(function(results)
+    {
+      var finished = [];
+      angular.forEach(results.models, function(model)
+      {
+        if(model.state == "finished")
+          this.push(model);
+      }, finished);
+
+      var running = [];
+      angular.forEach(results.models, function(model)
+      {
+        if(model.state != "finished")
+          this.push(model);
+      }, running);
+
+      $scope.finished = finished;
+      $scope.running = running;
+
+      $scope.current_revision = results.revision;
+      $window.setTimeout(update, 10); // Restart the request immediately.
+    })
+    .error(function()
+    {
+      $window.setTimeout(update, 5000); // Rate-limit requests when there's an error.
+    });
+  }
+
+  update();
 });
 
 slycat_application.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
