@@ -8,7 +8,7 @@ rights in this software.
 
 {{=<< >>=}}
 
-<html ng-app="slycat-application" ng-controller="slycat-model-controller" ng-init="init('<<slycat-server-root>>')">
+<html>
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,73 +17,72 @@ rights in this software.
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat.js"></script>
     <link rel="stylesheet" href="<<slycat-server-root>>style/bootstrap.min.css">
     <link rel="stylesheet" href="<<slycat-server-root>>style/slycat.css" type="text/css">
-    <title>{{model.name}} - Slycat Model</title>
+    <title>Slycat Model</title>
   </head>
 
   <body>
-    <div id="slycat-workers" class="container-fluid">
-    </div>
+    <div ng-app="slycat-application" ng-controller="slycat-model-controller" ng-init="init('<<slycat-server-root>>')">
+      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="<<slycat-server-root>>">Slycat</a>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="<<slycat-server-root>>projects/{{project._id}}">{{project.name}}</a></li>
+              <li class="active"><p class="navbar-text" popover-title="{{model.name}}" popover="{{model.description}}" popover-placement="bottom" popover-trigger="mouseenter" popover-animation="false">{{model.name}}</p></li>
 
-    <div id="slycat-header" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="<<slycat-server-root>>">Slycat</a>
-        </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="<<slycat-server-root>>projects/{{project._id}}">{{project.name}}</a></li>
-            <li class="active"><p class="navbar-text" popover-title="{{model.name}}" popover="{{model.description}}" popover-placement="bottom" popover-trigger="mouseenter" popover-animation="false">{{model.name}}</p></li>
-
-            <li class="dropdown" ng-controller="slycat-new-model-controller">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">New Models <span class="badge">{{(models | filter:{state:'finished'}).length}} / {{(models | filter:{state:'!finished'}).length}}</span> <span class="caret"></span></a>
-              <ul class="slycat-new-models dropdown-menu" role="menu">
-                <li ng-repeat="model in models | filter:{state:'finished'} | orderBy:'created':true">
-                  <a href="{{server_root + 'models/' + model._id}}">
-                    <span ng-click="close($event, model._id)" class="label" ng-class="model.result === 'succeeded' ? 'label-success' : 'label-danger'">{{model.result === "succeeded" ? "&#x2713;" : "&times;"}}</span>
-                    <span>{{model.name}}</span>
-                  </a>
-                </li>
-                <li ng-show="(models | filter:{state:'!finished'}).length ? true : false" class="divider"></li>
-                <li ng-repeat="model in models | filter:{state:'!finished'} | orderBy:'created':true">
-                  <a href="{{server_root + 'models/' + model._id}}"><span>{{model.name}}</span></a>
-                  <div class="progress" style="height:10px; margin: 0 10px">
-                    <div class="progress-bar" role="progressbar" ng-class="model.state === 'running' ? 'progress-bar-success' : 'progress-bar-primary'" style="width: {{model.progress * 100.0}}%;">
+              <li class="dropdown" ng-controller="slycat-new-model-controller">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">New Models <span class="badge">{{(models | filter:{state:'finished'}).length}} / {{(models | filter:{state:'!finished'}).length}}</span> <span class="caret"></span></a>
+                <ul class="slycat-new-models dropdown-menu" role="menu">
+                  <li ng-repeat="model in models | filter:{state:'finished'} | orderBy:'created':true">
+                    <a href="{{server_root + 'models/' + model._id}}">
+                      <span ng-click="close($event, model._id)" class="label" ng-class="model.result === 'succeeded' ? 'label-success' : 'label-danger'">{{model.result === "succeeded" ? "&#x2713;" : "&times;"}}</span>
+                      <span>{{model.name}}</span>
+                    </a>
+                  </li>
+                  <li ng-show="(models | filter:{state:'!finished'}).length ? true : false" class="divider"></li>
+                  <li ng-repeat="model in models | filter:{state:'!finished'} | orderBy:'created':true">
+                    <a href="{{server_root + 'models/' + model._id}}"><span>{{model.name}}</span></a>
+                    <div class="progress" style="height:10px; margin: 0 10px">
+                      <div class="progress-bar" role="progressbar" ng-class="model.state === 'running' ? 'progress-bar-success' : 'progress-bar-primary'" style="width: {{model.progress * 100.0}}%;">
+                      </div>
                     </div>
-                  </div>
-                </li>
-              </ul>
-            </li>
+                  </li>
+                </ul>
+              </li>
 
-          </ul>
-          <button type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit()">Edit Model</button>
+            </ul>
+            <button type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit()">Edit Model</button>
+          </div>
         </div>
+
+        <script type="text/ng-template" id="slycat-edit-model.html">
+          <div class="modal-header">
+            <h3 class="modal-title">Edit Model</h3>
+          </div>
+          <div class="modal-body">
+            <form role="form">
+              <div class="form-group">
+                <label for="slycat-model-name">Name</label>
+                <input id="slycat-model-name" class="form-control" type="text" ng-model="model.name"></input>
+              </div>
+              <div class="form-group">
+                <label for="slycat-model-description">Description</label>
+                <textarea id="slycat-model-description" class="form-control" rows="3" ng-model="model.description"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-danger pull-left" ng-click="delete()">Delete Model</button>
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+          </div>
+        </script>
       </div>
-
-      <script type="text/ng-template" id="slycat-edit-model.html">
-        <div class="modal-header">
-          <h3 class="modal-title">Edit Model</h3>
-        </div>
-        <div class="modal-body">
-          <form role="form">
-            <div class="form-group">
-              <label for="slycat-model-name">Name</label>
-              <input id="slycat-model-name" class="form-control" type="text" ng-model="model.name"></input>
-            </div>
-            <div class="form-group">
-              <label for="slycat-model-description">Description</label>
-              <textarea id="slycat-model-description" class="form-control" rows="3" ng-model="model.description"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-danger pull-left" ng-click="delete()">Delete Model</button>
-          <button class="btn btn-primary" ng-click="ok()">OK</button>
-          <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-        </div>
-      </script>
     </div>
 
-    <div id="slycat-content" class="container-fluid">
+    <div class="container-fluid">
       <<{ slycat-marking-html }>>
       <<{ slycat-plugin-content }>>
       <<{ slycat-marking-html }>>

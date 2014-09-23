@@ -1,6 +1,6 @@
-var slycat_application = angular.module("slycat-application", ["ui.bootstrap"]);
+var module = angular.module("slycat-application", ["ui.bootstrap"]);
 
-slycat_application.controller("slycat-new-model-controller", function($scope, $http, $window)
+module.controller("slycat-new-model-controller", function($scope, $http, $window)
 {
   $scope.current_revision = null;
   $scope.models = [];
@@ -32,7 +32,7 @@ slycat_application.controller("slycat-new-model-controller", function($scope, $h
   update();
 });
 
-slycat_application.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
+module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
 {
   $scope.server_root = "";
   $scope.project = {};
@@ -48,6 +48,7 @@ slycat_application.controller("slycat-model-controller", ["$scope", "$window", "
       {
         $scope.project = data;
       });
+      $window.document.title = $scope.model.name + " - Slycat Model";
       $http.put($window.location.href, {state : "closed"});
     });
   }
