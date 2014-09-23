@@ -1,5 +1,14 @@
 var module = angular.module("slycat-application", ["ui.bootstrap"]);
 
+module.directive("slycatNewModelDropdown", function()
+{
+  return {
+    "replace" : true,
+    "restrict" : "E",
+    "templateUrl" : "/templates/new-model-dropdown.html",
+  };
+});
+
 module.controller("slycat-new-model-controller", function($scope, $http, $window)
 {
   $scope.current_revision = null;
