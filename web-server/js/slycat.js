@@ -6,8 +6,9 @@ slycat_application.controller("slycat-new-model-controller", function($scope, $h
   $scope.finished = [];
   $scope.running = [];
 
-  $scope.close = function(mid)
+  $scope.close = function($event, mid)
   {
+    $event.preventDefault();
     $http.put($scope.server_root + "models/" + mid, {state : "closed"});
   }
 

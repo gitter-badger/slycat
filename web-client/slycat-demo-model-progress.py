@@ -15,7 +15,7 @@ def generate_model(connection, pid, marking):
 
   arguments = {}
   arguments["state"] = "finished"
-  arguments["result"] = numpy.random.choice(["succeeded", "failed"])
+  arguments["result"] = numpy.random.choice(["succeeded", "succeeded", "failed"])
   arguments["finished"] = datetime.datetime.utcnow().isoformat()
   arguments["progress"] = 1.0
   if arguments["result"] == "succeeded":
