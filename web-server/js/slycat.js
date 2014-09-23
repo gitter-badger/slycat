@@ -1,5 +1,51 @@
 var module = angular.module("slycat-application", ["ui.bootstrap"]);
 
+module.service("slycatNewModelService", ["$rootScope", "$window", "$http", function($rootScope, $window, $http)
+{
+  var service =
+  {
+    current_revision : null,
+    models : [],
+    update : function()
+    {
+      var url = "/models" + "?_=" + new Date().getTime();
+      if(service.current_revision != null)
+        url += "&revision=" + service.current_revision;
+
+      $http.get(url).success(function(results)
+      {
+        service.current_revision = results.revision;
+        service.models = results.models;
+        $rootScope.$broadcast("slycat-new-models-changed");
+        $window.setTimeout(service.update, 10); // Restart the request immediately.
+      })
+      .error(function()
+      {
+        $window.setTimeout(service.update, 5000); // Rate-limit requests when there's an error.
+      });
+    }
+  };
+
+  service.update();
+  return service;
+}]);
+
+module.controller("slycat-new-model-controller", ["$scope", "$http", "slycatNewModelService", function($scope, $http, slycatNewModelService)
+{
+  $scope.models = slycatNewModelService.models;
+
+  $scope.$on("slycat-new-models-changed", function()
+  {
+    $scope.models = slycatNewModelService.models;
+  });
+
+  $scope.close = function($event, mid)
+  {
+    $event.preventDefault();
+    $http.put($scope.server_root + "models/" + mid, {state : "closed"});
+  }
+}]);
+
 module.directive("slycatNewModelDropdown", function()
 {
   return {
@@ -7,38 +53,6 @@ module.directive("slycatNewModelDropdown", function()
     "restrict" : "E",
     "templateUrl" : "/templates/new-model-dropdown.html",
   };
-});
-
-module.controller("slycat-new-model-controller", function($scope, $http, $window)
-{
-  $scope.current_revision = null;
-  $scope.models = [];
-
-  $scope.close = function($event, mid)
-  {
-    $event.preventDefault();
-    $http.put($scope.server_root + "models/" + mid, {state : "closed"});
-  }
-
-  function update()
-  {
-    var url = $scope.server_root + "models" + "?_=" + new Date().getTime();
-    if($scope.current_revision != null)
-      url += "&revision=" + $scope.current_revision;
-
-    $http.get(url).success(function(results)
-    {
-      $scope.models = results.models;
-      $scope.current_revision = results.revision;
-      $window.setTimeout(update, 10); // Restart the request immediately.
-    })
-    .error(function()
-    {
-      $window.setTimeout(update, 5000); // Rate-limit requests when there's an error.
-    });
-  }
-
-  update();
 });
 
 module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
