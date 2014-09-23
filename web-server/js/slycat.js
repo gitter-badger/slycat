@@ -3,8 +3,7 @@ var slycat_application = angular.module("slycat-application", ["ui.bootstrap"]);
 slycat_application.controller("slycat-new-model-controller", function($scope, $http, $window)
 {
   $scope.current_revision = null;
-  $scope.finished = [];
-  $scope.running = [];
+  $scope.models = [];
 
   $scope.close = function($event, mid)
   {
@@ -20,23 +19,7 @@ slycat_application.controller("slycat-new-model-controller", function($scope, $h
 
     $http.get(url).success(function(results)
     {
-      var finished = [];
-      angular.forEach(results.models, function(model)
-      {
-        if(model.state == "finished")
-          this.push(model);
-      }, finished);
-
-      var running = [];
-      angular.forEach(results.models, function(model)
-      {
-        if(model.state != "finished")
-          this.push(model);
-      }, running);
-
-      $scope.finished = finished;
-      $scope.running = running;
-
+      $scope.models = results.models;
       $scope.current_revision = results.revision;
       $window.setTimeout(update, 10); // Restart the request immediately.
     })
