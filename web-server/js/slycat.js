@@ -6,6 +6,11 @@ slycat_application.controller("slycat-new-model-controller", function($scope, $h
   $scope.finished = [];
   $scope.running = [];
 
+  $scope.close = function(mid)
+  {
+    $http.put($scope.server_root + "models/" + mid, {state : "closed"});
+  }
+
   function update()
   {
     var url = $scope.server_root + "models" + "?_=" + new Date().getTime();
@@ -59,6 +64,7 @@ slycat_application.controller("slycat-model-controller", ["$scope", "$window", "
       {
         $scope.project = data;
       });
+      $http.put($window.location.href, {state : "closed"});
     });
   }
 
