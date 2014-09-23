@@ -63,35 +63,40 @@ Working Inside the Running Container
       name = Fred P. Smith
       email = fred@nowhere.com
 
-* By default, the Slycat repository in the container is configured for read-only
-  access to the public https://github.com/sandialabs/slycat repository.  You will
-  need to change it in order to push changes back to the repo.  There are two
-  alternatives:
+* By default, the git repository in the container is configured to access
+  the public Slycat repository using https://github.com/sandialabs/slycat repository.
+  If you want to push your commits to the public repository, there are three alternatives:
 
-  * Add your username to the https:// address.  Then, you will be prompted for your
-    github password whenever you push changes::
+  * Leave the repository URL unchanged, and push.  You will be prompted for your github
+    username and password.
+    
+  * Add your username to the repository URL.  Then, you will only be prompted for your
+    github password whenr you push::
 
       $ git remote set-url origin https://username@github.com/sandialabs/slycat
-
-    If you are working behind a proxy, you'll also need to let git know about it::
-
-      $ export https_proxy=http://your.proxy.name:80
 
   * Copy an existing github public key into the container, or generate a new github
     public key, and switch to communication over ssh::
 
     $ git remote set-url origin git@github.com:sandialabs/slycat
 
+.. NOTE::
+
+  If you're working behind a proxy with an https:// URL, you'll need to let git know about it::
+  
+    $ export https_proxy=http://your.proxy.name:80
+  
+
 Working Outside the Running Container
 -------------------------------------
 
-Instead of working on the Slycat source inside the running container, you may
+Instead of working on the Slycat sources inside the running container, you may
 wish to edit them from the outside.  One advantage of this approach is that you
-can edit the sources using more sophisticated graphical editors that installed
-on your host system, instead of the tools provided within the container.  Another
-is that the setup you perform (configuring your git credentials, setting-up
-proxy information) is part of your host system and will be retained even if you
-upgrade or replace the Slycat container.
+can edit the sources using sophisticated graphical tools installed
+on your host system, instead of the minimalist command-line tools provided within
+the container.  Another benefit is that the setup you perform (configuring your git
+credentials, setting-up proxy information) is part of your host system and will be
+retained even if you upgrade or replace the Slycat container.
 
 One way to do this is to use `sshfs` to mount the source code inside the
 container to a directory on the host::
@@ -99,8 +104,10 @@ container to a directory on the host::
   $ mkdir ~/src/slycat-container
   $ sshfs -p 2222 slycat@<docker host ip>:/home/slycat/src/slycat ~/src/slycat-container -oauto_cache,reconnect,defer_permissions,negative_vncache,volname=slycat-container
 
-Regardless of how you edit the sources, the Slycat server will still restart
-automatically whenever you make modifications, and you will likely want to
-run the server in an ssh session so you can see its logging output and restart
-it if necessary.
+The main disadvantage to working this way is the increased latency caused by the sshfs
+filesystem ... some operations (such as building the documentation) will be noticably
+slower when run on an sshfs mount
+
+Note that you'll still need to ssh into the container to run the Slycat server, but the server
+will still restart automatically whenever you save changes to the sshfs mount.
 
