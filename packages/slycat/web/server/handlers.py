@@ -46,6 +46,7 @@ def require_boolean_parameter(name):
 def get_context():
   """Helper function that populates a default context object for use expanding HTML templates."""
   context = {}
+  context["slycat-server-root"] = cherrypy.request.app.config["slycat"]["server-root"]
   context["server-root"] = cherrypy.request.app.config["slycat"]["server-root"]
   context["security"] = cherrypy.request.security
   context["is-server-administrator"] = slycat.web.server.authentication.is_server_administrator()

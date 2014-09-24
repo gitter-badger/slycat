@@ -32,11 +32,11 @@ module.service("slycatNewModelService", ["$rootScope", "$window", "$http", funct
 
 module.controller("slycat-new-model-controller", ["$scope", "$http", "slycatNewModelService", function($scope, $http, slycatNewModelService)
 {
-  $scope.models = slycatNewModelService.models;
+  $scope.new_models = slycatNewModelService.models;
 
   $scope.$on("slycat-new-models-changed", function()
   {
-    $scope.models = slycatNewModelService.models;
+    $scope.new_models = slycatNewModelService.models;
   });
 
   $scope.close = function($event, mid)
@@ -122,6 +122,87 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
     $scope.ok = function()
     {
       $modalInstance.close($scope.model);
+    }
+
+    $scope.cancel = function()
+    {
+      $modalInstance.dismiss("cancel");
+    }
+
+    $scope.delete = function()
+    {
+      $modalInstance.dismiss("delete");
+    }
+  };
+
+}]);
+
+module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
+{
+  $scope.server_root = "";
+  $scope.project = {};
+  $scope.models = [];
+
+  $scope.init = function(server_root)
+  {
+    $scope.server_root = server_root;
+    $http.get($window.location.href).success(function(data)
+    {
+      $scope.project = data;
+      $window.document.title = $scope.project.name + " - Slycat Project";
+    });
+
+    $http.get($window.location.href + "/models").success(function(data)
+    {
+      $scope.models = data;
+    });
+  }
+
+  $scope.edit = function()
+  {
+    var edit_dialog = $modal.open({
+      templateUrl: "slycat-edit-project.html",
+      controller: edit_dialog_controller,
+      resolve:
+      {
+        "project" : function() { return {"name":$scope.project.name, "description":$scope.project.description}; },
+      },
+    });
+
+    edit_dialog.result.then
+    (
+      function(changes)
+      {
+        $scope.project.name = changes.name;
+        $scope.project.description = changes.description;
+        $http.put($window.location.href, changes).error(function(data, status, headers, config)
+        {
+          console.log(data, status, headers, config);
+        });
+      },
+      function(reason)
+      {
+        if(reason == "delete")
+        {
+          if($window.confirm("Delete " + $scope.project.name + "? All data will be deleted immediately, and this cannot be undone."))
+          {
+            $http.delete($window.location.href).success(function()
+            {
+              $window.location.href = $scope.server_root + "projects";
+            });
+          }
+        }
+      }
+    );
+  }
+
+  var edit_dialog_controller = function ($scope, $window, $http, $modalInstance, project)
+  {
+    $scope.project = project;
+
+    $scope.ok = function()
+    {
+      $modalInstance.close($scope.project);
     }
 
     $scope.cancel = function()
