@@ -99,24 +99,8 @@ def get_project(pid):
   slycat.web.server.authentication.require_project_reader(project)
 
   if accept == "text/html":
-    models = [model for model in database.scan("slycat/project-models", startkey=pid, endkey=pid)]
-    models = sorted(models, key=lambda x: x["created"], reverse=True)
-
-    for model in models:
-      model["marking-html"] = slycat.web.server.plugin.manager.markings[model["marking"]]["html"]
-
     context = get_context()
-    context.update(project)
-    context["models"] = models
-    context["is-project-administrator"] = slycat.web.server.authentication.is_project_administrator(project)
-    context["can-write"] = slycat.web.server.authentication.is_server_administrator() or slycat.web.server.authentication.is_project_administrator(project) or slycat.web.server.authentication.is_project_writer(project)
-    context["can-administer"] = slycat.web.server.authentication.is_server_administrator() or slycat.web.server.authentication.is_project_administrator(project)
-    context["acl-json"] = json.dumps(project["acl"])
-    context["if-remote-hosts"] = len(cherrypy.request.app.config["slycat"]["remote-hosts"])
-    context["remote-hosts"] = json.dumps(get_remote_host_dict()).replace('"','\\"')
-    context["remote-hosts-arr"] = [host for host in cherrypy.request.app.config["slycat"]["remote-hosts"]]
-    context["new-model-name"] = "Model-%s" % (len(models) + 1)
-
+    context["slycat-markings"] = json.dumps(slycat.web.server.plugin.manager.markings)
     return slycat.web.server.template.render("project.html", context)
 
   if accept == "application/json":

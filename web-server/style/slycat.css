@@ -15,9 +15,15 @@ body
   min-width: 300px;
 }
 
+#slycat-project-model-container
+{
+  padding-top: 15px;
+}
+
 #slycat-model-container
 {
   margin: 0;
   padding: 0;
 }
+
 

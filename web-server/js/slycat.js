@@ -137,15 +137,22 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
 
 }]);
 
-module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
+module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", function($scope, $window, $http, $modal, $sce)
 {
   $scope.server_root = "";
+  $scope.markings = {};
   $scope.project = {};
   $scope.models = [];
+  $scope.myHTML = $sce.trustAsHtml('I am an <code>HTML</code>string with ' + '<a href="#">links!</a> and other <em>stuff</em>');
 
-  $scope.init = function(server_root)
+  $scope.init = function(server_root, markings)
   {
     $scope.server_root = server_root;
+    angular.forEach(markings, function(value, key)
+    {
+      $scope.markings[key] = {"label":value.label, "html":$sce.trustAsHtml(value.html)};
+    });
+
     $http.get($window.location.href).success(function(data)
     {
       $scope.project = data;

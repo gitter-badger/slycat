@@ -20,9 +20,10 @@ rights in this software.
   </head>
 
   <body>
-    <div ng-app="slycat-application" ng-controller="slycat-project-controller" ng-init="init('<<slycat-server-root>>')">
+    <div ng-app="slycat-application" ng-controller="slycat-project-controller" ng-init="init('<<slycat-server-root>>', <<slycat-markings>>)">
+
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container-fluid">
+        <div class="container">
           <div class="navbar-header">
             <a class="navbar-brand" href="<<slycat-server-root>>">Slycat</a>
           </div>
@@ -58,20 +59,25 @@ rights in this software.
           </div>
         </script>
       </div>
-      <div class="container-fluid">
+
+      <div id="slycat-project-model-container" class="container">
         <div class="panel panel-default">
+          <div class="panel-heading"><strong>{{project.name}}</strong> <small><em>Created {{project.created | date : "medium"}} by {{project.creator}}</em></small></div>
           <div class="panel-body" ng-show="project.description">{{project.description}}</div>
+        </div>
+
+        <div class="panel panel-default">
           <div class="list-group">
-            <a class="list-group-item" ng-repeat="model in models" href="<<slycat-server-root>>models/{{model._id}}">
+            <a class="list-group-item" ng-repeat="model in models | orderBy : 'created' : true" href="<<slycat-server-root>>models/{{model._id}}">
               <span class="label label-success">{{model["model-type"]}}</span>
               <strong>{{model.name}}</strong>
-              <small>{{model.description}}</small>
+              <div class="label" style="display: inline-block;" ng-bind-html="markings[model.marking].html"></div>
+              <p><small>{{model.description}} <em>Created {{model.created | date : "medium"}} by {{model.creator}}</em></small></p>
             </a>
           </div>
         </div>
       </div>
+
     </div>
-
-
   </body>
 </html>
