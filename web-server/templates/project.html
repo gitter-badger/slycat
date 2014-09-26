@@ -98,8 +98,13 @@ rights in this software.
 
       <div id="slycat-project-model-container" class="container">
         <div class="panel panel-default">
-          <div class="panel-heading"><strong>{{project.name}}</strong> <small><em>Created {{project.created | date : "medium"}} by {{project.creator}}</em></small></div>
-          <div class="panel-body" ng-show="project.description">{{project.description}}</div>
+          <div class="panel-heading"><span class="h4">{{project.name}}</span>
+          </div>
+          <div class="panel-body" ng-show="project.description">
+            <p>{{project.description}}
+              <small><em>Created {{project.created | date : "medium"}} by {{project.creator}}</em></small>
+            </p>
+          </div>
         </div>
 
         <div class="panel panel-default">
