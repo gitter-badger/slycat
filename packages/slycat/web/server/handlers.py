@@ -22,6 +22,7 @@ import slycat.web.server.database.couchdb
 import slycat.web.server.database.hdf5
 import slycat.web.server.model.cca
 import slycat.web.server.model.parameter_image
+import slycat.web.server.model.tracer_image
 import slycat.web.server.model.timeseries
 import slycat.web.server.plugin
 import slycat.web.server.ssh
@@ -51,7 +52,7 @@ def get_context():
   context["security"] = cherrypy.request.security
   context["is-server-administrator"] = slycat.web.server.authentication.is_server_administrator()
   context["stylesheets"] = {"path" : path for path in cherrypy.request.app.config["slycat"]["stylesheets"]}
-  context["marking-types"] = [{"type" : key, "label" : value["label"]} for key, value in slycat.web.server.plugin.manager.markings.items()]
+  context["marking-types"] = [{"type" : key, "label" : value["label"]} for key, value in slycat.web.server.plugin.manager.markings.items() if key in cherrypy.request.app.config["slycat"]["allowed-markings"]]
   context["help-email"] = cherrypy.request.app.config["site"]["help-email"]
   context["version"] = cherrypy.request.app.config["site"]["version"]
   return context
@@ -196,7 +197,7 @@ def post_project_models(pid):
       raise cherrypy.HTTPError("400 Missing required key: %s" % key)
 
   model_type = cherrypy.request.json["model-type"]
-  allowed_model_types = slycat.web.server.plugin.manager.models.keys() + ["cca", "timeseries", "parameter-image"]
+  allowed_model_types = slycat.web.server.plugin.manager.models.keys() + ["cca", "timeseries", "parameter-image", "tracer-image"]
   if model_type not in allowed_model_types:
     raise cherrypy.HTTPError("400 Allowed model types: %s" % ", ".join(allowed_model_types))
   marking = cherrypy.request.json["marking"]
@@ -322,6 +323,9 @@ def get_model(mid, **kwargs):
 
     if "model-type" in model and model["model-type"] == "parameter-image":
       return slycat.web.server.template.render("model-parameter-image.html", context)
+    
+    if "model-type" in model and model["model-type"] == "tracer-image":
+      return slycat.web.server.template.render("model-tracer-image.html", context)
 
     if "model-type" in model and model["model-type"] in slycat.web.server.plugin.manager.models.keys():
       context["slycat-server-root"] = context["server-root"]
@@ -359,7 +363,7 @@ def post_model_finish(mid):
 
   if model["state"] != "waiting":
     raise cherrypy.HTTPError("400 Only waiting models can be finished.")
-  if model["model-type"] not in slycat.web.server.plugin.manager.models.keys() + ["cca", "cca3", "timeseries", "parameter-image"]:
+  if model["model-type"] not in slycat.web.server.plugin.manager.models.keys() + ["cca", "cca3", "timeseries", "parameter-image", "tracer-image"]:
     raise cherrypy.HTTPError("500 Cannot finish unknown model type.")
 
   slycat.web.server.model.update(database, model, state="running", started = datetime.datetime.utcnow().isoformat(), progress = 0.0)
@@ -371,6 +375,8 @@ def post_model_finish(mid):
     slycat.web.server.model.timeseries.finish(database, model)
   elif model["model-type"] == "parameter-image":
     slycat.web.server.model.parameter_image.finish(database, model)
+  elif model["model-type"] == "tracer-image":
+    slycat.web.server.model.tracer_image.finish(database, model)
   cherrypy.response.status = "202 Finishing model."
 
 def put_model_file(mid, name, input=None, file=None):
@@ -1031,6 +1037,13 @@ def post_remote_browse():
     except Exception as e:
       cherrypy.log.error("Error accessing %s: %s %s" % (path, type(e), str(e)))
       raise cherrypy.HTTPError("400 Remote access failed: %s" % str(e))
+
+# need the content type when requesting the image
+# GET /remote/:sid/image/file/:path vs /remote/:sid/file/:path
+def get_remote_file_as_image(sid, path):
+  accept = cherrypy.lib.cptools.accept(["image/jpeg", "image/png"])
+  cherrypy.response.headers["content-type"] = accept
+  return get_remote_file(sid, path)
 
 def get_remote_file(sid, path):
   #accept = cherrypy.lib.cptools.accept(["image/jpeg", "image/png"])
