@@ -48,13 +48,49 @@ rights in this software.
               </div>
               <div class="form-group">
                 <label for="slycat-project-description">Description</label>
-                <textarea id="slycat-project-description" class="form-control" rows="3" ng-model="project.description"></textarea>
+                <textarea id="slycat-project-description" class="form-control" rows="4" ng-model="project.description"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Administrators</label>
+                <p class="help-block">Project administrators can read and write all data, and add or remove users.</p>
+                <div class="row" ng-repeat="user in project.acl.administrators">
+                  <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
+                  <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_administrator(user.user)">Remove</button></div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_administrator"></input></div>
+                  <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_administrator(new_administrator)">Add</button></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Project Writers</label>
+                <p class="help-block">Project writers can read and write all data.</p>
+                <div class="row" ng-repeat="user in project.acl.writers">
+                  <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
+                  <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_writer(user.user)">Remove</button></div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_writer"></input></div>
+                  <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_writer(new_writer)">Add</button></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Project Readers</label>
+                <p class="help-block">Project readers can read all data.</p>
+                <div class="row" ng-repeat="user in project.acl.readers">
+                  <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
+                  <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_reader(user.user)">Remove</button></div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_reader"></input></div>
+                  <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_reader(new_reader)">Add</button></div>
+                </div>
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button class="btn btn-danger pull-left" ng-click="delete()">Delete Project</button>
-            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-primary" ng-click="ok()">Save Changes</button>
             <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
           </div>
         </script>

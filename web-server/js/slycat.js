@@ -172,7 +172,7 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
       controller: edit_dialog_controller,
       resolve:
       {
-        "project" : function() { return {"name":$scope.project.name, "description":$scope.project.description}; },
+        "project" : function() { return {"name":$scope.project.name, "description":$scope.project.description, "acl":$scope.project.acl}; },
       },
     });
 
@@ -182,6 +182,7 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
       {
         $scope.project.name = changes.name;
         $scope.project.description = changes.description;
+        $scope.project.acl = changes.acl;
         $http.put($window.location.href, changes).error(function(data, status, headers, config)
         {
           console.log(data, status, headers, config);
@@ -203,9 +204,60 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
     );
   }
 
-  var edit_dialog_controller = function ($scope, $window, $http, $modalInstance, project)
+  var edit_dialog_controller = function ($scope, $window, $http, $modalInstance, $filter, project)
   {
     $scope.project = project;
+    $scope.new_administrator = null;
+    $scope.new_writer = null;
+    $scope.new_reader = null;
+
+    $scope.add_administrator = function(username)
+    {
+      $http.get("/users/" + username).success(function(user)
+      {
+        if(!$window.confirm("Make " + user.name + " an administrator?  They will be able to read and write all project data, plus add and remove project users."))
+          return;
+
+        $scope.project.acl.administrators.push({"user":username});
+      });
+    }
+
+    $scope.remove_administrator = function(username)
+    {
+      $scope.project.acl.administrators = $filter("filter")($scope.project.acl.administrators, {"user":"!" + username});
+    }
+
+    $scope.add_writer = function(username)
+    {
+      $http.get("/users/" + username).success(function(user)
+      {
+        if(!$window.confirm("Make " + user.name + " a writer?  They will be able to read and write all project data."))
+          return;
+
+        $scope.project.acl.writers.push({"user":username});
+      });
+    }
+
+    $scope.remove_writer = function(username)
+    {
+      $scope.project.acl.writers = $filter("filter")($scope.project.acl.writers, {"user":"!" + username});
+    }
+
+    $scope.add_reader = function(username)
+    {
+      $http.get("/users/" + username).success(function(user)
+      {
+        if(!$window.confirm("Make " + user.name + " a reader?  They will be able to read all project data."))
+          return;
+
+        $scope.project.acl.readers.push({"user":username});
+      });
+    }
+
+    $scope.remove_reader = function(username)
+    {
+      $scope.project.acl.readers = $filter("filter")($scope.project.acl.readers, {"user":"!" + username});
+    }
 
     $scope.ok = function()
     {
