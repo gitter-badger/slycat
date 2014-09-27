@@ -26,4 +26,12 @@ body
   padding: 0;
 }
 
+pre.slycat-alert-detail
+{
+  border: 0;
+}
 
+.slycat-model-alert
+{
+  margin-bottom: 0;
+}

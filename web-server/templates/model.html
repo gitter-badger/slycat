@@ -60,6 +60,11 @@ rights in this software.
           </div>
         </script>
       </div>
+
+      <div class="alert alert-{{alert.type}} slycat-model-alert" ng-repeat="alert in alerts">
+        <p>{{alert.message}}</p>
+        <pre ng-show="alert.detail" class="bg-{{alert.type}} slycat-alert-detail">{{alert.detail}}</pre>
+      </div>
     </div>
 
     <div id="slycat-model-container" class="container-fluid">

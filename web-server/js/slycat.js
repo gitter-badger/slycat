@@ -60,6 +60,7 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
   $scope.server_root = "";
   $scope.project = {};
   $scope.model = {};
+  $scope.alerts = [];
 
   $scope.init = function(server_root)
   {
@@ -72,6 +73,15 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
         $scope.project = data;
       });
       $window.document.title = $scope.model.name + " - Slycat Model";
+
+      if($scope.model.state == "waiting")
+        $scope.alerts.push({"type":"info", "message":"The model is waiting for data to be uploaded."})
+
+      if($scope.model.state == "running")
+        $scope.alerts.push({"type":"success", "message":"The model is being computed.  Patience!"})
+
+      if($scope.model.result == "failed")
+        $scope.alerts.push({"type":"danger", "message":"Model failed to build.  Here's what was happening when things went wrong:", "detail": $scope.model.message})
       $http.put($window.location.href, {state : "closed"});
     });
   }
