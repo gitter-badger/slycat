@@ -4,14 +4,19 @@ module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "
 {
   $scope.projects = [];
   $scope.projects_path = configuration["server-root"] + "projects";
-  $http.get($window.location.href).success(function(data)
+  $scope.update_projects = function()
   {
-    $scope.projects = data;
-    angular.forEach($scope.projects, function(project, key)
+    $http.get($window.location.href).success(function(data)
     {
-      project.path = configuration["server-root"] + "projects/" + project._id;
+      $scope.projects = data;
+      angular.forEach($scope.projects, function(project, key)
+      {
+        project.path = configuration["server-root"] + "projects/" + project._id;
+      });
     });
-  });
+  };
+
+  $scope.update_projects();
 
   $scope.create_project = function()
   {
@@ -26,10 +31,7 @@ module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "
       {
         $http.post($window.location.href, project).success(function()
         {
-          $http.get($window.location.href).success(function(data)
-          {
-            $scope.projects = data;
-          });
+          $scope.update_projects();
         })
         .error(function(data, status, headers, config)
         {
