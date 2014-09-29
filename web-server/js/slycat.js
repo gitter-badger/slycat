@@ -1,6 +1,6 @@
-var module = angular.module("slycat-application", ["ui.bootstrap"]);
+var module = angular.module("slycat-application", ["slycat-configuration", "ui.bootstrap"]);
 
-module.service("slycatNewModelService", ["$rootScope", "$window", "$http", function($rootScope, $window, $http)
+module.service("slycat-new-model-service", ["$rootScope", "$window", "$http", "slycat-configuration", function($rootScope, $window, $http, configuration)
 {
   var service =
   {
@@ -8,7 +8,7 @@ module.service("slycatNewModelService", ["$rootScope", "$window", "$http", funct
     models : [],
     update : function()
     {
-      var url = "/models" + "?_=" + new Date().getTime();
+      var url = configuration["server-root"] + "models" + "?_=" + new Date().getTime();
       if(service.current_revision != null)
         url += "&revision=" + service.current_revision;
 
@@ -30,19 +30,19 @@ module.service("slycatNewModelService", ["$rootScope", "$window", "$http", funct
   return service;
 }]);
 
-module.controller("slycat-new-model-controller", ["$scope", "$http", "slycatNewModelService", function($scope, $http, slycatNewModelService)
+module.controller("slycat-new-model-controller", ["$scope", "$http", "slycat-configuration", "slycat-new-model-service", function($scope, $http, configuration, new_model_service)
 {
-  $scope.new_models = slycatNewModelService.models;
+  $scope.new_models = new_model_service.models;
 
   $scope.$on("slycat-new-models-changed", function()
   {
-    $scope.new_models = slycatNewModelService.models;
+    $scope.new_models = new_model_service.models;
   });
 
   $scope.close = function($event, mid)
   {
     $event.preventDefault();
-    $http.put($scope.server_root + "models/" + mid, {state : "closed"});
+    $http.put(configuration["server-root"] + "models/" + mid, {state : "closed"});
   }
 }]);
 
@@ -55,36 +55,30 @@ module.directive("slycatNewModelDropdown", function()
   };
 });
 
-module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", function($scope, $window, $http, $modal)
+module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", "slycat-configuration", function($scope, $window, $http, $modal, configuration)
 {
-  $scope.server_root = "";
   $scope.project = {};
   $scope.model = {};
   $scope.alerts = [];
-
-  $scope.init = function(server_root)
+  $http.get($window.location.href).success(function(data)
   {
-    $scope.server_root = server_root;
-    $http.get($window.location.href).success(function(data)
+    $scope.model = data;
+    $http.get(configuration["server-root"] + "projects/" + $scope.model.project).success(function(data)
     {
-      $scope.model = data;
-      $http.get($scope.server_root + "projects/" + $scope.model.project).success(function(data)
-      {
-        $scope.project = data;
-      });
-      $window.document.title = $scope.model.name + " - Slycat Model";
-
-      if($scope.model.state == "waiting")
-        $scope.alerts.push({"type":"info", "message":"The model is waiting for data to be uploaded."})
-
-      if($scope.model.state == "running")
-        $scope.alerts.push({"type":"success", "message":"The model is being computed.  Patience!"})
-
-      if($scope.model.result == "failed")
-        $scope.alerts.push({"type":"danger", "message":"Model failed to build.  Here's what was happening when things went wrong:", "detail": $scope.model.message})
-      $http.put($window.location.href, {state : "closed"});
+      $scope.project = data;
     });
-  }
+    $window.document.title = $scope.model.name + " - Slycat Model";
+
+    if($scope.model.state == "waiting")
+      $scope.alerts.push({"type":"info", "message":"The model is waiting for data to be uploaded."})
+
+    if($scope.model.state == "running")
+      $scope.alerts.push({"type":"success", "message":"The model is being computed.  Patience!"})
+
+    if($scope.model.result == "failed")
+      $scope.alerts.push({"type":"danger", "message":"Model failed to build.  Here's what was happening when things went wrong:", "detail": $scope.model.message})
+    $http.put($window.location.href, {state : "closed"});
+  });
 
   $scope.edit = function()
   {
@@ -117,7 +111,7 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
           {
             $http.delete($window.location.href).success(function()
             {
-              $window.location.href = $scope.server_root + "projects/" + $scope.project._id;
+              $window.location.href = configuration["server-root"] + "projects/" + $scope.project._id;
             });
           }
         }
@@ -147,16 +141,14 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
 
 }]);
 
-module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", function($scope, $window, $http, $modal, $sce)
+module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", "slycat-configuration", function($scope, $window, $http, $modal, $sce, configuration)
 {
-  $scope.server_root = "";
   $scope.markings = {};
   $scope.project = {};
   $scope.models = [];
 
-  $scope.init = function(server_root, markings)
+  $scope.init = function(markings)
   {
-    $scope.server_root = server_root;
     angular.forEach(markings, function(value, key)
     {
       $scope.markings[key] = {"label":value.label, "html":$sce.trustAsHtml(value.html)};
@@ -205,7 +197,7 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
           {
             $http.delete($window.location.href).success(function()
             {
-              $window.location.href = $scope.server_root + "projects";
+              $window.location.href = configuration["server-root"] + "projects";
             });
           }
         }
@@ -286,20 +278,13 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
 
 }]);
 
-module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "$modal", "$sce", function($scope, $window, $http, $modal, $sce)
+module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "$modal", "$sce", "slycat-configuration", function($scope, $window, $http, $modal, $sce, configuration)
 {
-  $scope.server_root = "";
   $scope.projects = [];
-
-  $scope.init = function(server_root)
+  $http.get($window.location.href).success(function(data)
   {
-    $scope.server_root = server_root;
-
-    $http.get($window.location.href).success(function(data)
-    {
-      $scope.projects = data;
-    });
-  }
+    $scope.projects = data;
+  });
 
   $scope.create_project = function()
   {

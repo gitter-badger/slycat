@@ -14,6 +14,7 @@ rights in this software.
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="<<slycat-server-root>>js/angular.min.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/ui-bootstrap-tpls-0.11.0.min.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-configuration.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat.js"></script>
     <link rel="stylesheet" href="<<slycat-server-root>>style/bootstrap.min.css">
     <link rel="stylesheet" href="<<slycat-server-root>>style/slycat.css" type="text/css">
@@ -21,7 +22,7 @@ rights in this software.
   </head>
 
   <body>
-    <div ng-app="slycat-application" ng-controller="slycat-model-controller" ng-init="init('<<slycat-server-root>>')">
+    <div ng-app="slycat-application" ng-controller="slycat-model-controller">
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
           <div class="navbar-header">
