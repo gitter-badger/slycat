@@ -3,25 +3,31 @@ var module = angular.module("slycat-project", ["slycat-configuration", "slycat-n
 module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", "slycat-configuration", function($scope, $window, $http, $modal, $sce, configuration)
 {
   $scope.markings = {};
+  $scope.projects = {path:configuration["server-root"] + "projects"};
   $scope.project = {};
   $scope.models = [];
+
+  $http.get($window.location.href).success(function(data)
+  {
+    $scope.project = data;
+    $scope.project.path = configuration["server-root"] + "projects/" + $scope.project._id;
+    $window.document.title = $scope.project.name + " - Slycat Project";
+  });
+
+  $http.get($window.location.href + "/models").success(function(data)
+  {
+    $scope.models = data;
+    angular.forEach($scope.models, function(model, key)
+    {
+      model.path = configuration["server-root"] + "models/" + model._id;
+    });
+  });
 
   $scope.init = function(markings)
   {
     angular.forEach(markings, function(value, key)
     {
       $scope.markings[key] = {"label":value.label, "html":$sce.trustAsHtml(value.html)};
-    });
-
-    $http.get($window.location.href).success(function(data)
-    {
-      $scope.project = data;
-      $window.document.title = $scope.project.name + " - Slycat Project";
-    });
-
-    $http.get($window.location.href + "/models").success(function(data)
-    {
-      $scope.models = data;
     });
   }
 

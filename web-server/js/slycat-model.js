@@ -2,15 +2,18 @@ var module = angular.module("slycat-model", ["slycat-configuration", "slycat-new
 
 module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$modal", "slycat-configuration", function($scope, $window, $http, $modal, configuration)
 {
+  $scope.projects = {path:configuration["server-root"] + "projects"};
   $scope.project = {};
   $scope.model = {};
   $scope.alerts = [];
   $http.get($window.location.href).success(function(data)
   {
     $scope.model = data;
+    $scope.model.path = configuration["server-root"] + "models/" + $scope.model._id;
     $http.get(configuration["server-root"] + "projects/" + $scope.model.project).success(function(data)
     {
       $scope.project = data;
+      $scope.project.path = configuration["server-root"] + "projects/" + $scope.model.project;
     });
     $window.document.title = $scope.model.name + " - Slycat Model";
 
