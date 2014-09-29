@@ -16,6 +16,10 @@ module.service("slycat-new-model-service", ["$rootScope", "$window", "$http", "s
       {
         service.current_revision = results.revision;
         service.models = results.models;
+        angular.forEach(service.models, function(model, key)
+        {
+          model.path = configuration["server-root"] + "models/" + model._id;
+        });
         $rootScope.$broadcast("slycat-new-models-changed");
         $window.setTimeout(service.update, 10); // Restart the request immediately.
       })
