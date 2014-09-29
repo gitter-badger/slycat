@@ -6,138 +6,71 @@ DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 rights in this software.
 -->
 
+{{=<< >>=}}
+
 <html>
   <head>
-{{> head}}
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="<<slycat-server-root>>js/angular.min.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/ui-bootstrap-tpls-0.11.0.min.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/slycat.js"></script>
+    <link rel="stylesheet" href="<<slycat-server-root>>style/bootstrap.min.css">
+    <link rel="stylesheet" href="<<slycat-server-root>>style/slycat.css" type="text/css">
     <title>Slycat Projects</title>
   </head>
 
   <body>
-{{> header}}
+    <div ng-app="slycat-application" ng-controller="slycat-projects-controller" ng-init="init('<<slycat-server-root>>')">
 
-    <div id="page-title">
-      <div class="width-wrapper">
-        <h2>Projects</h2>
-      </div>
-    </div>
-
-    <div id="content">
-      <div class="width-wrapper">
-        <div id="new-project" class="buttonBar">
-          <div id="new-project-form" class="dialog" title="Add New Project">
-            <label for="new-project-name">Project Name</label>
-            <input id="new-project-name" class="text ui-widget-content ui-corner-all" />
-            <label for="new-project-description">Description</label>
-            <textarea id="new-project-description" class="text ui-widget-content ui-corner-all" rows="3" cols="20"></textarea>
+      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="<<slycat-server-root>>">Slycat</a>
           </div>
-          <button id="create-project" title="Create new Slycat project.">Add New Project</button>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <slycat-new-model-dropdown></slycat-new-model-dropdown>
+            </ul>
+            <button type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="create_project()">Create Project</button>
+          </div>
         </div>
-        <ul id="project-list" class="main-list">
-        </ul>
+
+        <script type="text/ng-template" id="slycat-create-project.html">
+          <div class="modal-header">
+            <h3 class="modal-title">Create Project</h3>
+          </div>
+          <div class="modal-body">
+            <form role="form">
+              <div class="form-group">
+                <label for="slycat-project-name">Name</label>
+                <input id="slycat-project-name" class="form-control" type="text" ng-model="project.name"></input>
+              </div>
+              <div class="form-group">
+                <label for="slycat-project-description">Description</label>
+                <textarea id="slycat-project-description" class="form-control" rows="4" ng-model="project.description"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">Create Project</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+          </div>
+        </script>
       </div>
-    </div>
 
-    <div id="footer">
-      <div class="width-wrapper">
+      <div id="slycat-projects-project-container" class="container">
+        <div class="panel panel-default">
+          <div class="list-group">
+            <a class="list-group-item" ng-repeat="project in projects | orderBy : 'created' : true" href="<<slycat-server-root>>projects/{{project._id}}">
+              <strong>{{project.name}}</strong>
+              <div class="label" style="display: inline-block;" ng-bind-html="markings[model.marking].html"></div>
+              <p><small>{{project.description}} <em>Created {{project.created | date : "medium"}} by {{project.creator}}</em></small></p>
+            </a>
+          </div>
+        </div>
       </div>
+
     </div>
-
-    <script type="text/javascript">
-      // Load the list of existing projects.
-      $.ajax(
-      {
-        type: "GET",
-        cache: false, // So the browser doesn't cache the JSON and display it to the user later-on.
-        url: "{{server-root}}projects",
-        dataType : "json",
-        success: function(projects)
-        {
-          var project_list = $("#project-list").empty();
-          $.each(projects, function(index, project)
-          {
-            $("<li>")
-              .append(
-                $("<div class='main-item'>")
-                  .append($("<a class='clicker'>")
-                    .attr("href", "{{server-root}}projects/" + project._id)
-                    )
-                  .append($("<h3 class='main-title'>")
-                    .append($("<a class='project-link'>")
-                      .attr("href", "{{server-root}}projects/" + project._id)
-                      .text(project.name)
-                      )
-                    )
-                  // .append($("<a class='main-tag project'>")
-                  //   .attr("href", "{{server-root}}projects/" + project._id)
-                  //   .text("Project")
-                  //   )
-                  .append($("<div class='main-created'>")
-                    .text("Created " + project.created + " by " + project.creator)
-                    )
-                  .append($("<p class='main-description'>")
-                    .text(project.description)
-                    )
-                )
-              .appendTo(project_list);
-          });
-        },
-        error: function(request, status, reason_phrase)
-        {
-          window.alert("Error retrieving project list: " + reason_phrase);
-        }
-      });
-
-      // Setup the user interface for creating new projects.
-      $( "#new-project-form" ).dialog(
-      {
-        autoOpen: false,
-        width: 700,
-        height: 400,
-        modal: true,
-        buttons:
-        {
-          "Create Project": function()
-          {
-            if(0 == $("#new-project-name").val().length)
-            {
-              alert("Cannot create new project with empty name.");
-              return;
-            }
-
-            $.ajax(
-            {
-              contentType : "application/json",
-              data: $.toJSON({
-                "name" : $("#new-project-name").val(),
-                "description": $("#new-project-description").val()
-              }),
-              processData: false,
-              type : "POST",
-              url : "{{server-root}}projects",
-              success: function(result)
-              {
-                window.location.href = "{{server-root}}projects/" + result.id;
-              },
-              error: function(request, status, reason_phrase)
-              {
-                window.alert("Error creating project: " + reason_phrase);
-              }
-            });
-          },
-          Cancel: function()
-          {
-            $(this).dialog("close");
-          }
-        },
-        close: function()
-        {
-        }
-      });
-
-	    $("#create-project").button().click(function()
-      {
-				$("#new-project-form").dialog("open");
-			});
-    </script>
   </body>
 </html>

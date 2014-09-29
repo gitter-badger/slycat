@@ -153,7 +153,6 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
   $scope.markings = {};
   $scope.project = {};
   $scope.models = [];
-  $scope.myHTML = $sce.trustAsHtml('I am an <code>HTML</code>string with ' + '<a href="#">links!</a> and other <em>stuff</em>');
 
   $scope.init = function(server_root, markings)
   {
@@ -282,6 +281,57 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
     $scope.delete = function()
     {
       $modalInstance.dismiss("delete");
+    }
+  };
+
+}]);
+
+module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "$modal", "$sce", function($scope, $window, $http, $modal, $sce)
+{
+  $scope.server_root = "";
+  $scope.projects = [];
+
+  $scope.init = function(server_root)
+  {
+    $scope.server_root = server_root;
+
+    $http.get($window.location.href).success(function(data)
+    {
+      $scope.projects = data;
+    });
+  }
+
+  $scope.create_project = function()
+  {
+    var edit_dialog = $modal.open({
+      templateUrl: "slycat-create-project.html",
+      controller: edit_dialog_controller,
+    });
+
+    edit_dialog.result.then
+    (
+      function(project)
+      {
+        $http.post($window.location.href, project).error(function(data, status, headers, config)
+        {
+          console.log(data, status, headers, config);
+        });
+      }
+    );
+  }
+
+  var edit_dialog_controller = function ($scope, $window, $http, $modalInstance, $filter)
+  {
+    $scope.project = {"name":"", "description":""};
+
+    $scope.ok = function()
+    {
+      $modalInstance.close($scope.project);
+    }
+
+    $scope.cancel = function()
+    {
+      $modalInstance.dismiss("cancel");
     }
   };
 
