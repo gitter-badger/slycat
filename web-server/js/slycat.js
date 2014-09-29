@@ -312,7 +312,14 @@ module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "
     (
       function(project)
       {
-        $http.post($window.location.href, project).error(function(data, status, headers, config)
+        $http.post($window.location.href, project).success(function()
+        {
+          $http.get($window.location.href).success(function(data)
+          {
+            $scope.projects = data;
+          });
+        })
+        .error(function(data, status, headers, config)
         {
           console.log(data, status, headers, config);
         });

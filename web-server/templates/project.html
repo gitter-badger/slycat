@@ -106,7 +106,7 @@ rights in this software.
           </div>
         </div>
 
-        <div class="panel panel-default">
+        <div class="panel panel-default" ng-show="models.length">
           <div class="list-group">
             <a class="list-group-item" ng-repeat="model in models | orderBy : 'created' : true" href="<<slycat-server-root>>models/{{model._id}}">
               <span class="label label-default">{{model["model-type"]}}</span>
