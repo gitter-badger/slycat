@@ -7,6 +7,7 @@ rights in this software.
 body
 {
   background: #f3f2f0;
+  overflow-y: scroll;
   padding-top: 50px;
 }
 
