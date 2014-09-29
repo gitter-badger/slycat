@@ -17,6 +17,7 @@ rights in this software.
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat.js"></script>
     <link rel="stylesheet" href="<<slycat-server-root>>style/bootstrap.min.css">
     <link rel="stylesheet" href="<<slycat-server-root>>style/slycat.css" type="text/css">
+    <title>Slycat Project</title>
   </head>
 
   <body>
@@ -29,7 +30,7 @@ rights in this software.
           </div>
           <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-              <li><a href="<<slycat-server-root>>projects/{{project._id}}">{{project.name}}</a></li>
+              <li class="active"><a href="<<slycat-server-root>>projects/{{project._id}}">{{project.name}}</a></li>
               <slycat-new-model-dropdown></slycat-new-model-dropdown>
             </ul>
             <button type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit()">Edit Project</button>
