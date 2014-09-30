@@ -112,7 +112,7 @@ rights in this software.
         <div class="panel panel-default" ng-show="models.length">
           <div class="list-group">
             <a class="list-group-item" ng-repeat="model in models | orderBy : 'created' : true" href="{{model.path}}">
-              <span class="label label-default">{{model["model-type"]}}</span>
+              <span class="label label-default">{{model["model-type"]}} model</span>
               <strong>{{model.name}}</strong>
               <div class="label" style="display: inline-block;" ng-bind-html="markings[model.marking].html"></div>
               <span ng-show="model.result == 'failed'" class="label label-danger" popover-placement="right" popover="{{model.message}}" popover-title="Error message:" popover-trigger="mouseenter" class="bg-danger">Failed</span>

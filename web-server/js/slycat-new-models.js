@@ -8,7 +8,7 @@ module.service("slycat-new-model-service", ["$rootScope", "$window", "$http", "s
     models : [],
     update : function()
     {
-      var url = configuration["server-root"] + "models" + "?_=" + new Date().getTime();
+      var url = configuration["server-root"] + "models?_=" + new Date().getTime();
       if(service.current_revision != null)
         url += "&revision=" + service.current_revision;
 

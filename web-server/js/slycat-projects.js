@@ -6,7 +6,7 @@ module.controller("slycat-projects-controller", ["$scope", "$window", "$http", "
   $scope.projects_path = configuration["server-root"] + "projects";
   $scope.update_projects = function()
   {
-    $http.get($window.location.href).success(function(data)
+    $http.get($window.location.href + "?_=" + new Date().getTime()).success(function(data)
     {
       $scope.projects = data;
       angular.forEach($scope.projects, function(project, key)

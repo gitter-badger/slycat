@@ -61,10 +61,11 @@ rights in this software.
         </script>
       </div>
 
-      <div id="slycat-projects-project-container" class="container">
+      <div id="slycat-projects-project-container" class="container" ng-show="projects.length">
         <div class="panel panel-default">
           <div class="list-group">
             <a class="list-group-item" ng-repeat="project in projects | orderBy : 'created' : true" href="{{project.path}}">
+              <span class="label label-default">project</span>
               <strong>{{project.name}}</strong>
               <p><small>{{project.description}} <em>Created {{project.created | date : "medium"}} by {{project.creator}}</em></small></p>
             </a>
