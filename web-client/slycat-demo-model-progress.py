@@ -4,7 +4,7 @@ import slycat.web.client
 import threading
 import time
 
-def generate_model(connection, pid, marking):
+def generate_model(connection, pid, marking, index):
   def random_failure(probability):
     if numpy.random.uniform(0, 1) < probability:
       connection.update_model(mid, state="finished", result="failed", finished=datetime.datetime.utcnow().isoformat(), message="RANDOM FAILURE!!!")
@@ -12,9 +12,9 @@ def generate_model(connection, pid, marking):
     return False
 
   # Wait awhile before starting
-  time.sleep(numpy.random.uniform(0, 2))
+  time.sleep(numpy.random.uniform(0, 5))
 
-  mid = connection.post_project_models(pid, "generic", "Model %s" % datetime.datetime.now(), marking)
+  mid = connection.post_project_models(pid, "generic", "Model %s %s" % (index, datetime.datetime.now()), marking)
 
   if random_failure(probability=0.01):
     return
@@ -38,14 +38,14 @@ def generate_model(connection, pid, marking):
 
 parser = slycat.web.client.option_parser()
 parser.add_argument("--marking", default="", help="Marking type.  Default: %(default)s")
-parser.add_argument("--model-count", type=int, default=4, help="Model count.  Default: %(default)s")
+parser.add_argument("--model-count", type=int, default=8, help="Model count.  Default: %(default)s")
 parser.add_argument("--project-name", default="Demo Model Progress Project", help="New project name.  Default: %(default)s")
 arguments = parser.parse_args()
 
 connection = slycat.web.client.connect(arguments)
 pid = connection.find_or_create_project(arguments.project_name)
 
-threads = [threading.Thread(target=generate_model, args=(connection, pid, arguments.marking)) for i in range(arguments.model_count)]
+threads = [threading.Thread(target=generate_model, args=(connection, pid, arguments.marking, i)) for i in range(arguments.model_count)]
 for thread in threads:
   thread.start()
 for thread in threads:

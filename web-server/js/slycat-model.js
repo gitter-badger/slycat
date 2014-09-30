@@ -25,7 +25,9 @@ module.controller("slycat-model-controller", ["$scope", "$window", "$http", "$mo
 
     if($scope.model.result == "failed")
       $scope.alerts.push({"type":"danger", "message":"Model failed to build.  Here's what was happening when things went wrong:", "detail": $scope.model.message})
-    $http.put($window.location.href, {state : "closed"});
+
+    if($scope.model.state == "finished")
+      $http.put($window.location.href, {state : "closed"});
   });
 
   $scope.edit = function()
