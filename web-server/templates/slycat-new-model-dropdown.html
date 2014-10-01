@@ -3,7 +3,7 @@
   <ul class="dropdown-menu" role="menu">
     <li ng-repeat="model in new_models | filter:{state:'finished'} | orderBy:'created':true track by model._id">
       <a href="{{model.path}}">
-        <span ng-click="close($event, model._id)" class="label" ng-class="model.result === 'succeeded' ? 'label-success' : 'label-danger'">{{model.result === "succeeded" ? "&#x2713;" : "&times;"}}</span>
+        <button ng-click="close($event, model._id)" type="button" class="btn btn-default btn-xs" ng-class="{'btn-success':model.result === 'succeeded', 'btn-danger':model.result !== 'succeeded'}"><span class="glyphicon glyphicon-ok"></span></button>
         <span>{{model.name}}</span>
       </a>
     </li>

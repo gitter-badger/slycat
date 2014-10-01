@@ -1,8 +1,10 @@
 var module = angular.module("slycat-project", ["slycat-configuration", "slycat-model-changes", "ui.bootstrap", "xeditable"]);
 
-module.run(function(editableOptions)
+module.run(function(editableOptions, editableThemes)
 {
   editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
+  editableThemes.bs3.inputClass = 'input';
+  editableThemes.bs3.buttonsClass = 'btn-xs';
 });
 
 module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", "slycat-configuration", function($scope, $window, $http, $modal, $sce, configuration)
