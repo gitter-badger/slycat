@@ -1,4 +1,4 @@
-<li class="dropdown" ng-controller="slycat-new-model-controller" ng-show="new_models.length">
+<li class="dropdown" ng-controller="slycat-model-changes-controller" ng-show="new_models.length">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" tooltip="New models" tooltip-placement="bottom"><span class="badge">{{(new_models | filter:{state:'finished'}).length}} / {{(new_models | filter:{state:'!finished'}).length}}</span> <span class="caret"></span></a>
   <ul class="dropdown-menu" role="menu">
     <li ng-repeat="model in new_models | filter:{state:'finished'} | orderBy:'created':true track by model._id">

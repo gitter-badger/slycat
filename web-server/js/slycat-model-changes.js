@@ -1,6 +1,6 @@
-var module = angular.module("slycat-new-models", ["slycat-configuration"]);
+var module = angular.module("slycat-model-changes", ["slycat-configuration"]);
 
-module.service("slycat-new-model-service", ["$rootScope", "$window", "$http", "slycat-configuration", function($rootScope, $window, $http, configuration)
+module.service("slycat-model-changes-service", ["$rootScope", "$window", "$http", "slycat-configuration", function($rootScope, $window, $http, configuration)
 {
   var service =
   {
@@ -20,7 +20,7 @@ module.service("slycat-new-model-service", ["$rootScope", "$window", "$http", "s
         {
           model.path = configuration["server-root"] + "models/" + model._id;
         });
-        $rootScope.$broadcast("slycat-new-models-changed");
+        $rootScope.$broadcast("slycat-models-changed");
         $window.setTimeout(service.update, 10); // Restart the request immediately.
       })
       .error(function()
@@ -34,13 +34,13 @@ module.service("slycat-new-model-service", ["$rootScope", "$window", "$http", "s
   return service;
 }]);
 
-module.controller("slycat-new-model-controller", ["$scope", "$http", "slycat-configuration", "slycat-new-model-service", function($scope, $http, configuration, new_model_service)
+module.controller("slycat-model-changes-controller", ["$scope", "$http", "slycat-configuration", "slycat-model-changes-service", function($scope, $http, configuration, model_changes)
 {
-  $scope.new_models = new_model_service.models;
+  $scope.new_models = model_changes.models;
 
-  $scope.$on("slycat-new-models-changed", function()
+  $scope.$on("slycat-models-changed", function()
   {
-    $scope.new_models = new_model_service.models;
+    $scope.new_models = model_changes.models;
   });
 
   $scope.close = function($event, mid)
@@ -55,7 +55,7 @@ module.directive("slycatNewModelDropdown", function()
   return {
     "replace" : true,
     "restrict" : "E",
-    "templateUrl" : "/templates/new-model-dropdown.html",
+    "templateUrl" : "/templates/slycat-new-model-dropdown.html",
   };
 });
 

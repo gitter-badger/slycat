@@ -1,4 +1,4 @@
-var module = angular.module("slycat-project", ["slycat-configuration", "slycat-new-models", "ui.bootstrap"]);
+var module = angular.module("slycat-project", ["slycat-configuration", "slycat-model-changes", "ui.bootstrap"]);
 
 module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", "slycat-configuration", function($scope, $window, $http, $modal, $sce, configuration)
 {

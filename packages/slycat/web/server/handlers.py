@@ -67,7 +67,7 @@ def get_projects(_=None):
 
   if accept == "text/html":
     context = get_context()
-    return slycat.web.server.template.render("projects.html", context)
+    return slycat.web.server.template.render("slycat-projects.html", context)
 
   if accept == "application/json":
     database = slycat.web.server.database.couchdb.connect()
@@ -102,7 +102,7 @@ def get_project(pid):
   if accept == "text/html":
     context = get_context()
     context["slycat-markings"] = json.dumps(slycat.web.server.plugin.manager.markings)
-    return slycat.web.server.template.render("project.html", context)
+    return slycat.web.server.template.render("slycat-project.html", context)
 
   if accept == "application/json":
     return json.dumps(project)
@@ -335,7 +335,7 @@ def get_model(mid, **kwargs):
       context["slycat-marking-html"] = slycat.web.server.plugin.manager.markings[model["marking"]]["html"]
       context["slycat-plugin-content"] = slycat.web.server.plugin.manager.models[model["model-type"]]["html"](database, model)
 
-    return slycat.web.server.template.render("model.html", context)
+    return slycat.web.server.template.render("slycat-model.html", context)
 
 def get_model_command(mid, command, **kwargs):
   database = slycat.web.server.database.couchdb.connect()
