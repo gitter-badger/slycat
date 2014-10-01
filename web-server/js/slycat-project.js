@@ -1,4 +1,9 @@
-var module = angular.module("slycat-project", ["slycat-configuration", "slycat-model-changes", "ui.bootstrap"]);
+var module = angular.module("slycat-project", ["slycat-configuration", "slycat-model-changes", "ui.bootstrap", "xeditable"]);
+
+module.run(function(editableOptions)
+{
+  editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs2', 'default'
+});
 
 module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$modal", "$sce", "slycat-configuration", function($scope, $window, $http, $modal, $sce, configuration)
 {
@@ -7,7 +12,7 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
   $scope.project = {};
   $scope.models = [];
 
-  $http.get($window.location.href).success(function(data)
+  $http.get($window.location.href + "?_=" + new Date().getTime()).success(function(data)
   {
     $scope.project = data;
     $scope.project.path = configuration["server-root"] + "projects/" + $scope.project._id;
@@ -28,6 +33,22 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
     angular.forEach(markings, function(value, key)
     {
       $scope.markings[key] = {"label":value.label, "html":$sce.trustAsHtml(value.html)};
+    });
+  }
+
+  $scope.save_name = function()
+  {
+    $http.put($window.location.href, {"name":$scope.project.name}).error(function(data, status, headers, config)
+    {
+      console.log(data, status, headers, config);
+    });
+  }
+
+  $scope.save_description = function()
+  {
+    $http.put($window.location.href, {"description":$scope.project.description}).error(function(data, status, headers, config)
+    {
+      console.log(data, status, headers, config);
     });
   }
 

@@ -13,11 +13,13 @@ rights in this software.
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="<<slycat-server-root>>js/angular.min.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/xeditable.min.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/ui-bootstrap-tpls-0.11.0.min.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-project.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-model-changes.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-configuration.js"></script>
     <link rel="stylesheet" href="<<slycat-server-root>>style/bootstrap.min.css">
+    <link rel="stylesheet" href="<<slycat-server-root>>style/xeditable.css">
     <link rel="stylesheet" href="<<slycat-server-root>>style/slycat.css" type="text/css">
     <title>Slycat Project</title>
   </head>
@@ -102,10 +104,10 @@ rights in this software.
 
       <div id="slycat-project-model-container" class="container">
         <div class="panel panel-default">
-          <div class="panel-heading"><span class="h4">{{project.name}}</span>
+          <div class="panel-heading"><span class="h4" editable-text="project.name" onaftersave="save_name()">{{project.name}}</span>
           </div>
           <div class="panel-body">
-            <p ng-show="project.description">{{project.description}}</p>
+            <p editable-textarea="project.description" e-rows="7" e-cols="80" onaftersave="save_description()">{{project.description || "Project Description"}}</p>
             <p><small><em>Created {{project.created | date : "medium"}} by {{project.creator}}</em></small></p>
           </div>
         </div>

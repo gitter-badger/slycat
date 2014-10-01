@@ -109,7 +109,7 @@ def post_projects():
   cherrypy.response.status = "201 Project created."
   return {"id" : pid}
 
-def get_project(pid):
+def get_project(pid, _=None):
   accept = cherrypy.lib.cptools.accept(["text/html", "application/json"])
   cherrypy.response.headers["content-type"] = accept
 
