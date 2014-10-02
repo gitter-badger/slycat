@@ -11,6 +11,24 @@ body
   padding-top: 50px;
 }
 
+.navbar-header
+{
+  background-color: white;
+  background-image: url('slycat-brand.png');
+  background-position: 8px 2px;
+  background-repeat: no-repeat;
+  background-size: 110px;
+  width: 130px;
+}
+
+.navbar-brand
+{
+  display: inline-block;
+  margin: 0 !important;
+  padding: 0;
+  width: 100%;
+}
+
 .popover
 {
   min-width: 300px;
@@ -36,3 +54,4 @@ pre.slycat-alert-detail
 {
   margin-bottom: 0;
 }
+
