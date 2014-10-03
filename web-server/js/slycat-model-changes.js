@@ -34,28 +34,3 @@ module.service("slycat-model-changes-service", ["$rootScope", "$window", "$http"
   return service;
 }]);
 
-module.controller("slycat-model-changes-controller", ["$scope", "$http", "slycat-configuration", "slycat-model-changes-service", function($scope, $http, configuration, model_changes)
-{
-  $scope.new_models = model_changes.models;
-
-  $scope.$on("slycat-models-changed", function()
-  {
-    $scope.new_models = model_changes.models;
-  });
-
-  $scope.close = function($event, mid)
-  {
-    $event.preventDefault();
-    $http.put(configuration["server-root"] + "models/" + mid, {state : "closed"});
-  }
-}]);
-
-module.directive("slycatNewModelDropdown", function()
-{
-  return {
-    "replace" : true,
-    "restrict" : "E",
-    "templateUrl" : "/templates/slycat-new-model-dropdown.html",
-  };
-});
-

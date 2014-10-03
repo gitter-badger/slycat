@@ -15,9 +15,10 @@ rights in this software.
     <script type="text/javascript" src="<<slycat-server-root>>js/angular.min.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/xeditable.min.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/ui-bootstrap-tpls-0.11.0.min.js"></script>
-    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-project.js"></script>
-    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-model-changes.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-configuration.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-model-changes.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-navbar.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-project.js"></script>
     <link rel="stylesheet" href="<<slycat-server-root>>css/bootstrap.min.css">
     <link rel="stylesheet" href="<<slycat-server-root>>css/xeditable.css">
     <link rel="stylesheet" href="<<slycat-server-root>>css/slycat.css" type="text/css">
@@ -26,82 +27,7 @@ rights in this software.
 
   <body>
     <div ng-app="slycat-project" ng-controller="slycat-project-controller" ng-init="init(<<slycat-markings>>)">
-
-      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="{{projects.path}}"></a>
-          </div>
-          <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-              <li><a href="{{projects.path}}">Projects</a></li>
-              <li class="active"><a href="{{project.path}}">{{project.name}}</a></li>
-              <slycat-new-model-dropdown></slycat-new-model-dropdown>
-            </ul>
-            <button type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit()">Edit Project</button>
-          </div>
-        </div>
-
-        <script type="text/ng-template" id="slycat-edit-project.html">
-          <div class="modal-header">
-            <h3 class="modal-title">Edit Project</h3>
-          </div>
-          <div class="modal-body">
-            <form role="form">
-              <div class="form-group">
-                <label for="slycat-project-name">Name</label>
-                <input id="slycat-project-name" class="form-control" type="text" ng-model="project.name"></input>
-              </div>
-              <div class="form-group">
-                <label for="slycat-project-description">Description</label>
-                <textarea id="slycat-project-description" class="form-control" rows="4" ng-model="project.description"></textarea>
-              </div>
-              <div class="form-group">
-                <label>Administrators</label>
-                <p class="help-block">Project administrators can read and write all data, and add or remove users.</p>
-                <div class="row" ng-repeat="user in project.acl.administrators">
-                  <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
-                  <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_administrator(user.user)">Remove</button></div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_administrator"></input></div>
-                  <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_administrator(new_administrator)">Add</button></div>
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Project Writers</label>
-                <p class="help-block">Project writers can read and write all data.</p>
-                <div class="row" ng-repeat="user in project.acl.writers">
-                  <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
-                  <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_writer(user.user)">Remove</button></div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_writer"></input></div>
-                  <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_writer(new_writer)">Add</button></div>
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Project Readers</label>
-                <p class="help-block">Project readers can read all data.</p>
-                <div class="row" ng-repeat="user in project.acl.readers">
-                  <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
-                  <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_reader(user.user)">Remove</button></div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_reader"></input></div>
-                  <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_reader(new_reader)">Add</button></div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-danger pull-left" ng-click="delete()">Delete Project</button>
-            <button class="btn btn-primary" ng-click="ok()">Save Changes</button>
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-          </div>
-        </script>
-      </div>
-
+      <slycat-navbar></slycat-navbar>
       <div id="slycat-project-model-container" class="container">
         <div class="panel panel-default">
           <div class="panel-heading"><span class="h4" editable-text="project.name" e-size="80" onaftersave="save_name()">{{project.name}}</span>
@@ -112,9 +38,9 @@ rights in this software.
           </div>
         </div>
 
-        <div class="panel panel-default" ng-show="models.length">
+        <div class="panel panel-default" ng-show="models.list.length">
           <div class="list-group">
-            <a class="list-group-item" ng-repeat="model in models | orderBy : 'created' : true" href="{{model.path}}">
+            <a class="list-group-item" ng-repeat="model in models.list | orderBy : 'created' : true" href="{{model.path}}">
               <span class="label label-default">{{model["model-type"]}} model</span>
               <strong>{{model.name}}</strong>
               <div class="label" style="display: inline-block;" ng-bind-html="markings[model.marking].html"></div>

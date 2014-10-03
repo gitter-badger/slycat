@@ -34,13 +34,3 @@ module.service("slycat-project-changes-service", ["$rootScope", "$window", "$htt
   return service;
 }]);
 
-module.controller("slycat-project-changes-controller", ["$scope", "$http", "slycat-configuration", "slycat-project-changes-service", function($scope, $http, configuration, project_changes)
-{
-  $scope.projects = project_changes.projects;
-
-  $scope.$on("slycat-projects-changed", function()
-  {
-    $scope.projects = project_changes.projects;
-  });
-}]);
-

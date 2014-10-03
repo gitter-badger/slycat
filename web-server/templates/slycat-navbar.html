@@ -1,0 +1,140 @@
+<div ng-controller="slycat-navbar-controller" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="{{projects.path}}"></a>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li ng-class="{active : !project && !model}"><a href="{{projects.path}}">Projects</a></li>
+        <li ng-class="{active : project && !model}" ng-show="project"><a href="{{project.path}}">{{project.name}}</a></li>
+        <li ng-class="{active : model}" ng-show="model"><a href="{{model.path}}">{{model.name}}</a></li>
+        <li class="dropdown" ng-show="new_models.list.length">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="badge">{{(new_models.list | filter:{state:'finished'}).length}} / {{(new_models.list | filter:{state:'!finished'}).length}}</span> <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li ng-repeat="model in new_models.list | filter:{state:'finished'} | orderBy:'created':true track by model._id">
+              <a href="{{model.path}}">
+                <button ng-click="close_model($event, model._id)" type="button" class="btn btn-default btn-xs" ng-class="{'btn-success':model.result === 'succeeded', 'btn-danger':model.result !== 'succeeded'}"><span class="glyphicon glyphicon-ok"></span></button>
+                <span>{{model.name}}</span>
+              </a>
+            </li>
+            <li ng-show="(new_models.list | filter:{state:'!finished'}).length ? true : false" class="divider"></li>
+            <li ng-repeat="model in new_models.list | filter:{state:'!finished'} | orderBy:'created':true track by model._id">
+              <a href="{{model.path}}"><span>{{model.name}}</span></a>
+              <div class="progress" style="height:10px; margin: 0 10px">
+                <div class="progress-bar" role="progressbar" ng-class="model.state === 'running' ? 'progress-bar-success' : 'progress-bar-primary'" style="width: {{model.progress * 100.0}}%;">
+                </div>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <button ng-show="!project && !model" type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="create_project()">Create Project</button>
+      <button ng-show="project && !model" type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit_project()">Edit Project</button>
+      <button ng-show="model" type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit_model()">Edit Model</button>
+    </div>
+  </div>
+
+  <script type="text/ng-template" id="slycat-create-project.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Create Project</h3>
+    </div>
+    <div class="modal-body">
+      <form role="form">
+        <div class="form-group">
+          <label for="slycat-project-name">Name</label>
+          <input id="slycat-project-name" class="form-control" type="text" ng-model="project.name"></input>
+        </div>
+        <div class="form-group">
+          <label for="slycat-project-description">Description</label>
+          <textarea id="slycat-project-description" class="form-control" rows="4" ng-model="project.description"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="ok()">Create Project</button>
+      <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="slycat-edit-project.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Project</h3>
+    </div>
+    <div class="modal-body">
+      <form role="form">
+        <div class="form-group">
+          <label for="slycat-project-name">Name</label>
+          <input id="slycat-project-name" class="form-control" type="text" ng-model="project.name"></input>
+        </div>
+        <div class="form-group">
+          <label for="slycat-project-description">Description</label>
+          <textarea id="slycat-project-description" class="form-control" rows="4" ng-model="project.description"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Administrators</label>
+          <p class="help-block">Project administrators can read and write all data, and add or remove users.</p>
+          <div class="row" ng-repeat="user in project.acl.administrators">
+            <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
+            <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_administrator(user.user)">Remove</button></div>
+          </div>
+          <div class="row">
+            <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_administrator"></input></div>
+            <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_administrator(new_administrator)">Add</button></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Project Writers</label>
+          <p class="help-block">Project writers can read and write all data.</p>
+          <div class="row" ng-repeat="user in project.acl.writers">
+            <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
+            <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_writer(user.user)">Remove</button></div>
+          </div>
+          <div class="row">
+            <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_writer"></input></div>
+            <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_writer(new_writer)">Add</button></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Project Readers</label>
+          <p class="help-block">Project readers can read all data.</p>
+          <div class="row" ng-repeat="user in project.acl.readers">
+            <div class="col-xs-offset-2 col-xs-6">{{user.user}}</div>
+            <div class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="remove_reader(user.user)">Remove</button></div>
+          </div>
+          <div class="row">
+            <div class="col-xs-offset-2 col-xs-6"><input type="text" class="form-control input-sm" title="Username" placeholder="Username" ng-model="new_reader"></input></div>
+            <div class="col-xs-2"><button type="button" class="btn btn-success btn-xs" ng-click="add_reader(new_reader)">Add</button></div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger pull-left" ng-click="delete()">Delete Project</button>
+      <button class="btn btn-primary" ng-click="ok()">Save Changes</button>
+      <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="slycat-edit-model.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Model</h3>
+    </div>
+    <div class="modal-body">
+      <form role="form">
+        <div class="form-group">
+          <label for="slycat-model-name">Name</label>
+          <input id="slycat-model-name" class="form-control" type="text" ng-model="model.name"></input>
+        </div>
+        <div class="form-group">
+          <label for="slycat-model-description">Description</label>
+          <textarea id="slycat-model-description" class="form-control" rows="3" ng-model="model.description"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger pull-left" ng-click="delete()">Delete Model</button>
+      <button class="btn btn-primary" ng-click="ok()">Save Changes</button>
+      <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
+</div>

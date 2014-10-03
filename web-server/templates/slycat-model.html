@@ -17,6 +17,7 @@ rights in this software.
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-configuration.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-model-changes.js"></script>
     <script type="text/javascript" src="<<slycat-server-root>>js/slycat-model.js"></script>
+    <script type="text/javascript" src="<<slycat-server-root>>js/slycat-navbar.js"></script>
     <link rel="stylesheet" href="<<slycat-server-root>>css/bootstrap.min.css">
     <link rel="stylesheet" href="<<slycat-server-root>>css/slycat.css" type="text/css">
     <title>Slycat Model</title>
@@ -24,46 +25,7 @@ rights in this software.
 
   <body>
     <div ng-app="slycat-model" ng-controller="slycat-model-controller">
-      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="{{projects.path}}"></a>
-          </div>
-          <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-              <li><a href="{{projects.path}}">Projects</a></li>
-              <li><a href="{{project.path}}">{{project.name}}</a></li>
-              <li class="active"><a href="{{model.path}}">{{model.name}}</a></li>
-              <slycat-new-model-dropdown></slycat-new-model-dropdown>
-            </ul>
-            <button type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit()">Edit Model</button>
-          </div>
-        </div>
-
-        <script type="text/ng-template" id="slycat-edit-model.html">
-          <div class="modal-header">
-            <h3 class="modal-title">Edit Model</h3>
-          </div>
-          <div class="modal-body">
-            <form role="form">
-              <div class="form-group">
-                <label for="slycat-model-name">Name</label>
-                <input id="slycat-model-name" class="form-control" type="text" ng-model="model.name"></input>
-              </div>
-              <div class="form-group">
-                <label for="slycat-model-description">Description</label>
-                <textarea id="slycat-model-description" class="form-control" rows="3" ng-model="model.description"></textarea>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-danger pull-left" ng-click="delete()">Delete Model</button>
-            <button class="btn btn-primary" ng-click="ok()">Save Changes</button>
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-          </div>
-        </script>
-      </div>
-
+      <slycat-navbar></slycat-navbar>
       <div class="alert alert-{{alert.type}} slycat-model-alert" ng-repeat="alert in alerts">
         <p>{{alert.message}}</p>
         <pre ng-show="alert.detail" class="bg-{{alert.type}} slycat-alert-detail">{{alert.detail}}</pre>
