@@ -2,6 +2,7 @@ var module = angular.module("slycat-navbar", ["slycat-configuration", "slycat-mo
 
 module.controller("slycat-navbar-controller", ["$scope", "$http", "$modal", "$window", "slycat-configuration", "slycat-model-changes-service", function($scope, $http, $modal, $window, configuration, model_changes_service)
 {
+  $scope.support_email = configuration["support-email"] || null;
   $scope.new_models = {"list" : model_changes_service.models};
 
   $scope.$on("slycat-models-changed", function()
@@ -161,9 +162,9 @@ module.controller("slycat-navbar-controller", ["$scope", "$http", "$modal", "$wi
 
   $scope.edit_model = function()
   {
-    var edit_model = $modal.open({
+    var edit_model_dialog = $modal.open({
       templateUrl: "slycat-edit-model.html",
-      controller: edit_model_controller,
+      controller: edit_model_dialog_controller,
       resolve:
       {
         "project" : function() { return {"_id":$scope.project._id}; },
@@ -171,7 +172,7 @@ module.controller("slycat-navbar-controller", ["$scope", "$http", "$modal", "$wi
       },
     });
 
-    edit_model.result.then
+    edit_model_dialog.result.then
     (
       function(changes)
       {
@@ -198,7 +199,7 @@ module.controller("slycat-navbar-controller", ["$scope", "$http", "$modal", "$wi
     );
   }
 
-  var edit_model_controller = function ($scope, $window, $http, $modalInstance, model)
+  var edit_model_dialog_controller = function ($scope, $window, $http, $modalInstance, model)
   {
     $scope.model = model;
 
@@ -218,6 +219,25 @@ module.controller("slycat-navbar-controller", ["$scope", "$http", "$modal", "$wi
     }
   };
 
+  $scope.about = function()
+  {
+    var about_dialog = $modal.open({
+      templateUrl: "slycat-about.html",
+      controller: about_controller,
+      resolve:
+      {
+      },
+    });
+  }
+
+  var about_controller = function($scope, $modalInstance)
+  {
+    $scope.brand = {"image" : configuration["server-root"] + "css/slycat-brand.png"}
+    $scope.ok = function()
+    {
+      $modalInstance.close();
+    }
+  };
 }]);
 
 module.directive("slycatNavbar", ["slycat-configuration", function(configuration)

@@ -28,6 +28,15 @@
           </ul>
         </li>
       </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-click="about()">About Slycat</a></li>
+            <li><a href="mailto:{{support_email}}?subject=Slycat Support Request">Email Support</a></li>
+          </ul>
+        </li>
+      </ul>
       <button ng-show="!project && !model" type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="create_project()">Create Project</button>
       <button ng-show="project && !model" type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit_project()">Edit Project</button>
       <button ng-show="model" type="button" class="btn btn-default btn-xs navbar-btn navbar-right" ng-click="edit_model()">Edit Model</button>
@@ -135,6 +144,21 @@
       <button class="btn btn-danger pull-left" ng-click="delete()">Delete Model</button>
       <button class="btn btn-primary" ng-click="ok()">Save Changes</button>
       <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="slycat-about.html">
+    <div class="modal-body">
+      <div class="jumbotron">
+        <img src="{{brand.image}}"/>
+        <p>&hellip; is the web-based analysis and visualization platform created at Sandia National Laboratories.</p>
+        <p>See the documentation at <a href="http://slycat.readthedocs.org">http://slycat.readthedocs.org</a>.</p>
+        <p>Get the source at <a href="http://github.com/sandialabs/slycat">http://github.com/sandialabs/slycat</a>.</p>
+      </div>
+      <p><small>Copyright 2013, Sandia Corporation. Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain rights in this software.</small></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="ok()">Close</button>
     </div>
   </script>
 </div>
