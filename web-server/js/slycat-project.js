@@ -42,6 +42,7 @@ module.controller("slycat-project-controller", ["$scope", "$window", "$http", "$
 
   $scope.save_name = function()
   {
+    $window.document.title = $scope.project.name + " - Slycat Project";
     $http.put($window.location.href, {"name":$scope.project.name}).error(function(data, status, headers, config)
     {
       console.log(data, status, headers, config);
